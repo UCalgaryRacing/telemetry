@@ -1,0 +1,9 @@
+provides:
+{
+
+}
+
+sources:
+{
+    batteryUtils.c
+}

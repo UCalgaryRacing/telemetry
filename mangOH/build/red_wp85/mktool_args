@@ -1,0 +1,7 @@
+mksys
+-t
+wp85
+--cflags=-O2
+--object-dir=build/red_wp85
+--output-dir=build/update_files
+red.sdef

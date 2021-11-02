@@ -1,0 +1,27 @@
+# Build Products
+_build_*
+
+# ... per target
+*.localhost
+*.ar7
+*.ar86
+*.wp85
+*.virt
+*.update
+*.uinst
+
+# Vim
+*.swp
+
+# Eclipse / Developer Studio
+.cproject
+.project
+.settings
+package.properties
+wmnew.opt
+/Target_Legato_Debug/
+/Target_Legato_Release/
+*/inc-gen/
+
+# KDev4
+*.kdev4

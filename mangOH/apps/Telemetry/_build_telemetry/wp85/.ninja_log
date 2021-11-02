@@ -1,0 +1,27 @@
+# ninja log v5
+110	128	1581556044	_build_telemetry/wp85/app/telemetry/obj/Telemetry/Telemetry	90297c51b7213aa9
+0	87	1580783737	_build_telemetry/wp85/component/f37896fa0dac2efb3ac56399bee74faf/obj/819a005d1ea6d66dbd8b3a0a73ea2914.o	4d1c7d2edae213d7
+130	136	1581556044	_build_telemetry/wp85/app/telemetry/staging/info.properties	4586d9c6b8b56f0d
+1	258	1580856906	_build_telemetry/wp85/api/c2dc3a53ab93f3dcd1079ec7dba7e633/client/le_avdata_interface.h	af8ad27277512fa9
+0	68	1580770633	_build_telemetry/wp85/component/f37896fa0dac2efb3ac56399bee74faf/obj/_componentMain.c.o	b45f6537fb3fb39f
+110	112	1581556044	_build_telemetry/wp85/app/telemetry/staging/read-only/lib/libComponent_Sender.so	8db85322914ade34
+0	79	1580874162	_build_telemetry/wp85/component/a5216103d1408c4d53d00c306b60c022/obj/f497a6dbbbe1e681082df9ea971e550b.o	7771ad35797fd121
+0	86	1581553684	_build_telemetry/wp85/component/3263bf84500114402a3508238e75ef90/obj/_componentMain.c.o	4316a42b540dee68
+92	110	1581556044	_build_telemetry/wp85/staging/read-only/lib/libComponent_Sender.so	d7d300e504245d9d
+0	92	1581556044	_build_telemetry/wp85/component/3263bf84500114402a3508238e75ef90/obj/61abd604fad99e483057f0233a675962.o	25a77da82123d51a
+136	152	1581556044	telemetry.wp85.update	3275e5f557040dd6
+128	129	1581556044	_build_telemetry/wp85/app/telemetry/staging/read-only/bin/Telemetry	a87c93a1f17c75eb
+1	115	1581553684	_build_telemetry/wp85/app/telemetry/obj/Telemetry/_main.c.o	9eedaca96d28e6fb
+1	258	1580856906	_build_telemetry/wp85/api/c2dc3a53ab93f3dcd1079ec7dba7e633/client/le_avdata_client.c	af8ad27277512fa9
+0	5	1581553250	_build_telemetry/wp85/build.ninja	83ddbd8cfa418b87
+1	94	1580867931	_build_telemetry/wp85/component/a5216103d1408c4d53d00c306b60c022/obj/_componentMain.c.o	1bcaf728833331ea
+1	258	1580856906	_build_telemetry/wp85/api/c2dc3a53ab93f3dcd1079ec7dba7e633/client/le_avdata_messages.h	af8ad27277512fa9
+258	424	1580856906	_build_telemetry/wp85/api/c2dc3a53ab93f3dcd1079ec7dba7e633/client/le_avdata_client.c.o	c39a667490373c67
+1	4	1581556147	_build_telemetry/wp85/app/telemetry/staging/read-only/lib/libComponent_Sender.so	8db85322914ade34
+1	4	1581556147	_build_telemetry/wp85/app/telemetry/staging/read-only/bin/Telemetry	a87c93a1f17c75eb
+5	17	1581556147	_build_telemetry/wp85/app/telemetry/staging/info.properties	4586d9c6b8b56f0d
+17	43	1581556147	telemetry.wp85.update	3275e5f557040dd6
+1	4	1581556199	_build_telemetry/wp85/app/telemetry/staging/read-only/lib/libComponent_Sender.so	8db85322914ade34
+1	4	1581556199	_build_telemetry/wp85/app/telemetry/staging/read-only/bin/Telemetry	a87c93a1f17c75eb
+4	19	1581556199	_build_telemetry/wp85/app/telemetry/staging/info.properties	4586d9c6b8b56f0d
+19	48	1581556199	telemetry.wp85.update	3275e5f557040dd6

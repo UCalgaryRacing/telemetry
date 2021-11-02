@@ -1,0 +1,7 @@
+requires: {
+	
+}
+
+sources: {
+	sendingWorker.c
+}
