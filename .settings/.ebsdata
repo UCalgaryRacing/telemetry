@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LegatoProject:LegatoSystemProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:LegatoProject="http://legatoProject.ecore" etpID="[Built-in] Legato for WP85/WP75 R17 (18.6.4.wp85-wp75-native-x86_64-201907181047) - WP750X" customBuildOptions="--cflags=-O2 --object-dir=build/$@ --output-dir=$(UPDATE_FILE_DIR)">
-  <configurations mbsConfigId="legato.core.af.projectType.system.release.808354111" sdefFileName="env_test_yellow.sdef"/>
-  <configurations mbsConfigId="legato.core.af.projectType.system.debug.1070938781" sdefFileName="env_test_yellow.sdef"/>
+  <configurations mbsConfigId="legato.core.af.projectType.system.release.133674817" sdefFileName="red.sdef"/>
+  <configurations mbsConfigId="legato.core.af.projectType.system.debug.137264337" sdefFileName="red.sdef"/>
 </LegatoProject:LegatoSystemProject>

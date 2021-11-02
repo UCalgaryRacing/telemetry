@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="legato.core.af.projectType.system.release.808354111">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="legato.core.af.projectType.system.release.808354111" moduleId="org.eclipse.cdt.core.settings" name="Target_Legato_Release">
+		<cconfiguration id="legato.core.af.projectType.system.release.133674817">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="legato.core.af.projectType.system.release.133674817" moduleId="org.eclipse.cdt.core.settings" name="Target_Legato_Release">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
@@ -13,16 +13,16 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="${DsLegatoModuleType}.update" artifactName="${DsLegatoSdefFile}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,com.wavecom.openat.ide.buildArtefactType=com.wavecom.openat.ide.ebs.core.systemproject" description="" id="legato.core.af.projectType.system.release.808354111" name="Target_Legato_Release" parent="legato.core.af.projectType.system.release">
-					<folderInfo id="legato.core.af.projectType.system.release.808354111." name="/" resourcePath="">
-						<toolChain id="legato.core.af.projectType.system.release.toolchain.1364608557" name="Legato Application Framework GCC" superClass="legato.core.af.projectType.system.release.toolchain">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="legato.targetPlatform.gnu.cross.74585517" isAbstract="false" osList="all" superClass="legato.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/SRController}/Target_Legato_Release" id="com.swi.ebs.legato.core.builder.af.1059891003" keepEnvironmentInBuildfile="false" name="[Sierra Wireless] Legato Application Framework Builder" superClass="com.swi.ebs.legato.core.builder.af"/>
-							<tool id="com.swi.ebs.legato.core.tool.mkapp.980850520" name="mkapp Tool" superClass="com.swi.ebs.legato.core.tool.mkapp"/>
-							<tool id="com.swi.ebs.legato.core.tool.mkcomp.2030845554" name="mkcomp Tool" superClass="com.swi.ebs.legato.core.tool.mkcomp"/>
-							<tool id="com.swi.ebs.legato.core.tool.mksys.382577581" name="mksys Tool" superClass="com.swi.ebs.legato.core.tool.mksys">
-								<inputType id="com.swi.ebs.legato.core.inputType.mksys.c.1022447196" superClass="com.swi.ebs.legato.core.inputType.mksys.c"/>
-								<inputType id="com.swi.ebs.legato.core.inputType.mksys.cpp.1019356369" superClass="com.swi.ebs.legato.core.inputType.mksys.cpp"/>
+				<configuration artifactExtension="${DsLegatoModuleType}.update" artifactName="${DsLegatoSdefFile}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,com.wavecom.openat.ide.buildArtefactType=com.wavecom.openat.ide.ebs.core.systemproject" description="" id="legato.core.af.projectType.system.release.133674817" name="Target_Legato_Release" parent="legato.core.af.projectType.system.release">
+					<folderInfo id="legato.core.af.projectType.system.release.133674817." name="/" resourcePath="">
+						<toolChain id="legato.core.af.projectType.system.release.toolchain.579836046" name="Legato Application Framework GCC" superClass="legato.core.af.projectType.system.release.toolchain">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="legato.targetPlatform.gnu.cross.284537282" isAbstract="false" osList="all" superClass="legato.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/telemetry}/Target_Legato_Release" id="com.swi.ebs.legato.core.builder.af.632843759" keepEnvironmentInBuildfile="false" name="[Sierra Wireless] Legato Application Framework Builder" superClass="com.swi.ebs.legato.core.builder.af"/>
+							<tool id="com.swi.ebs.legato.core.tool.mkapp.1390872858" name="mkapp Tool" superClass="com.swi.ebs.legato.core.tool.mkapp"/>
+							<tool id="com.swi.ebs.legato.core.tool.mkcomp.135261535" name="mkcomp Tool" superClass="com.swi.ebs.legato.core.tool.mkcomp"/>
+							<tool id="com.swi.ebs.legato.core.tool.mksys.506007160" name="mksys Tool" superClass="com.swi.ebs.legato.core.tool.mksys">
+								<inputType id="com.swi.ebs.legato.core.inputType.mksys.c.569349967" superClass="com.swi.ebs.legato.core.inputType.mksys.c"/>
+								<inputType id="com.swi.ebs.legato.core.inputType.mksys.cpp.864323892" superClass="com.swi.ebs.legato.core.inputType.mksys.cpp"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -32,8 +32,8 @@
 				<externalSettings containerId="com.wavecom.openat.ide.ebs.build.core.settingsprovider" factoryId="org.eclipse.cdt.core.extension.container.factory"/>
 			</storageModule>
 		</cconfiguration>
-		<cconfiguration id="legato.core.af.projectType.system.debug.1070938781">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="legato.core.af.projectType.system.debug.1070938781" moduleId="org.eclipse.cdt.core.settings" name="Target_Legato_Debug">
+		<cconfiguration id="legato.core.af.projectType.system.debug.137264337">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="legato.core.af.projectType.system.debug.137264337" moduleId="org.eclipse.cdt.core.settings" name="Target_Legato_Debug">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
@@ -44,16 +44,16 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${DsLegatoSdefFile}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,com.wavecom.openat.ide.buildArtefactType=com.wavecom.openat.ide.ebs.core.systemproject" description="" id="legato.core.af.projectType.system.debug.1070938781" name="Target_Legato_Debug" parent="legato.core.af.projectType.system.debug">
-					<folderInfo id="legato.core.af.projectType.system.debug.1070938781." name="/" resourcePath="">
-						<toolChain id="legato.core.af.projectType.system.debug.toolchain.1943508150" name="Legato Application Framework GCC" superClass="legato.core.af.projectType.system.debug.toolchain">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="legato.targetPlatform.gnu.cross.592677504" isAbstract="false" osList="all" superClass="legato.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/SRController}/Target_Legato_Debug" id="com.swi.ebs.legato.core.builder.af.1031217164" keepEnvironmentInBuildfile="false" name="[Sierra Wireless] Legato Application Framework Builder" superClass="com.swi.ebs.legato.core.builder.af"/>
-							<tool id="com.swi.ebs.legato.core.tool.mkapp.644875375" name="mkapp Tool" superClass="com.swi.ebs.legato.core.tool.mkapp"/>
-							<tool id="com.swi.ebs.legato.core.tool.mkcomp.2023679692" name="mkcomp Tool" superClass="com.swi.ebs.legato.core.tool.mkcomp"/>
-							<tool id="com.swi.ebs.legato.core.tool.mksys.2091168881" name="mksys Tool" superClass="com.swi.ebs.legato.core.tool.mksys">
-								<inputType id="com.swi.ebs.legato.core.inputType.mksys.c.850251834" superClass="com.swi.ebs.legato.core.inputType.mksys.c"/>
-								<inputType id="com.swi.ebs.legato.core.inputType.mksys.cpp.8086054" superClass="com.swi.ebs.legato.core.inputType.mksys.cpp"/>
+				<configuration artifactName="${DsLegatoSdefFile}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,com.wavecom.openat.ide.buildArtefactType=com.wavecom.openat.ide.ebs.core.systemproject" description="" id="legato.core.af.projectType.system.debug.137264337" name="Target_Legato_Debug" parent="legato.core.af.projectType.system.debug">
+					<folderInfo id="legato.core.af.projectType.system.debug.137264337." name="/" resourcePath="">
+						<toolChain id="legato.core.af.projectType.system.debug.toolchain.1314466280" name="Legato Application Framework GCC" superClass="legato.core.af.projectType.system.debug.toolchain">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="legato.targetPlatform.gnu.cross.893720827" isAbstract="false" osList="all" superClass="legato.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/telemetry}/Target_Legato_Debug" id="com.swi.ebs.legato.core.builder.af.376273373" keepEnvironmentInBuildfile="false" name="[Sierra Wireless] Legato Application Framework Builder" superClass="com.swi.ebs.legato.core.builder.af"/>
+							<tool id="com.swi.ebs.legato.core.tool.mkapp.150918028" name="mkapp Tool" superClass="com.swi.ebs.legato.core.tool.mkapp"/>
+							<tool id="com.swi.ebs.legato.core.tool.mkcomp.854559499" name="mkcomp Tool" superClass="com.swi.ebs.legato.core.tool.mkcomp"/>
+							<tool id="com.swi.ebs.legato.core.tool.mksys.2109250145" name="mksys Tool" superClass="com.swi.ebs.legato.core.tool.mksys">
+								<inputType id="com.swi.ebs.legato.core.inputType.mksys.c.641948899" superClass="com.swi.ebs.legato.core.inputType.mksys.c"/>
+								<inputType id="com.swi.ebs.legato.core.inputType.mksys.cpp.1200016380" superClass="com.swi.ebs.legato.core.inputType.mksys.cpp"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -68,7 +68,7 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="SRController.legato.core.af.projectType.system.1265346836" name="" projectType="legato.core.af.projectType.system"/>
+		<project id="telemetry.legato.core.af.projectType.system.582867022" name="" projectType="legato.core.af.projectType.system"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 </cproject>
