@@ -3,12 +3,15 @@ start: manual
 version: 1.0
 
 executables: {
-	Telemetry = ( Sender )
+	Transceiver = ( Transceiver )
+	Interceptor = (Interceptor )
+
 }
 
 processes: {
 	run: {
-		( Telemetry )
+		( Transceiver )
+		( Interceptor )
 	}
 }
 
