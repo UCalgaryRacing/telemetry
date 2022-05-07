@@ -1,16 +1,9 @@
-/* 
-Copyright Schulich Racing, FSAE
-Written by Jonathan Mulyk
-*/ 
 
-#include "flash.h"
+#include "receiver.h"
 
-SensorArray fetch_sensors() 
-{
-
-}
-
-void fetch_sensor_diff(uint64_t last_update) 
-{
-
+void receive_thread() {
+  // First, create the socket
+  // Have infinite loop that is waiting for messages
+  // Handle messages
+  // Use external semaphore to start and stop
 }

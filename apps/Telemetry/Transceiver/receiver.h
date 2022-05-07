@@ -1,15 +1,7 @@
-/* 
-Copyright Schulich Racing, FSAE
-Written by Jonathan Mulyk
-*/ 
 
-#ifndef RECEIVER
-#define RECEIVER
+#ifndef RECEIVER_H
+#define RECEIVER_H
 
-#include "flash.h"
-
-SensorArray fetch_sensors();
-
-void fetch_sensor_diff(uint64_t last_update);
+void receiver_thread();
 
 #endif
