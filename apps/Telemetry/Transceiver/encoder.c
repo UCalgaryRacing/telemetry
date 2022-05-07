@@ -1,3 +1,8 @@
+/* 
+Copyright Schulich Racing, FSAE
+Written by Jonathan Mulyk
+*/ 
+
 #include "encoder.h"
 
 EncodedData encode_data(unsigned int size, unsigned int timestamp)

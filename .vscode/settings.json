@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "transmittercpplink.h": "c",
+        "transmittercpplink.hpp": "c"
+    }
+}
