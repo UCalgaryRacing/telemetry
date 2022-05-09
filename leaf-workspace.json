@@ -1,0 +1,10 @@
+{
+    "leafMinVersion": "2.4.0",
+    "profiles": {
+        "Telemetry": {
+            "packages": {
+                "swi-wp76": "5.0.0"
+            }
+        }
+    }
+}
