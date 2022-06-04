@@ -2,5 +2,6 @@
 #define CAN_H
 
 void readCAN();
+void runReadCAN();
 
 #endif

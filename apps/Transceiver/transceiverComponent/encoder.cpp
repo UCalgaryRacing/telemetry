@@ -1,5 +1,5 @@
-#include "encoder.h"
-#include "global.h"
+#include "encoder.hpp"
+#include "global.hpp"
 
 #include <stdio.h>
 #include <vector>
@@ -8,6 +8,9 @@
 #include <iostream>
 #include <string>
 
+#define TESTING_OFF 0
+
+#if TESTING_OFF
 void write_data(unsigned char *data, unsigned int size)
 {
   mtx.lock();
@@ -15,8 +18,10 @@ void write_data(unsigned char *data, unsigned int size)
   GlobalData.size = size;
   mtx.unlock();
 }
+#endif
 
 void encode_data(unsigned int timestamp, std::vector<int> &data) {
+  #if TESTING_OFF
   // Encode the data 
   // Then write to the global data
   // Use a mutex
@@ -49,4 +54,5 @@ void encode_data(unsigned int timestamp, std::vector<int> &data) {
   printf("\n");
 #endif
   //write_data(_,_);
+  #endif
 }
