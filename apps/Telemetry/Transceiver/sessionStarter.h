@@ -3,7 +3,7 @@
 
 #include "legato.h"
 
-//LE_SHARED void AvSessionStateHandler(le_avdata_SessionState_t state, void *context);
-//LE_SHARED void startSession();
+LE_SHARED void AvSessionStateHandler(le_avdata_SessionState_t state, void *context);
+LE_SHARED void startSession();
 
 #endif

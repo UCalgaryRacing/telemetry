@@ -1,7 +1,6 @@
 #include "legato.h"
-#include "interfaces.h"
 #include "sendingWorker.h"
-#include "sessionStarter.c"
+#include "sessionStarter.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
