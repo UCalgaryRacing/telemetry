@@ -1,11 +1,14 @@
+#define LEGATO_ON 0
+#if LEGATO_ON
+#include "legato.h"
+#include <le_thread.h>
+#include "interfaces.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <thread>
 #include <vector>
-#include "legato.h"
-#include <le_thread.h>
-#include "interfaces.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <linux/can.h>
@@ -13,11 +16,11 @@
 #include <optional>
 
 #include "../External Libraries/httplib.h"
+#include "../External Libraries/json.hpp"
 #include "global.hpp"
 #include "sensor.hpp"
 #include "can.hpp"
 #include "encoder.hpp"
-
 
 void readCAN() 
 {
@@ -33,29 +36,6 @@ void readCAN()
 }
 
 #if 0
-std::optional<std::vector<Sensor>> fetch_sensors(TransceiverData *td) 
-{
-  std::vector<Sensor> sensors;
-  std::string endpoint = "/api/database/sensors/thing/" + td->_serial_number;
-  httplib::Client client(td->_web_address);
-  client.set_read_timeout(100000);
-  httplib::Headers headers = {{"apiKey", td->_api_key}};
-  if (auto res = client.Get(std::move(endpoint.c_str()), headers)) {
-    if (res->status == 200) {
-      json body = json::parse(res->body).at("data");
-      for (json::iterator it = body.begin(); it != body.end(); ++it) {
-        sensors.push_back(Sensor(*it));
-      }
-    } else {
-      return std::nullopt;
-    }
-  } else {
-    return std::nullopt;
-  }
-  return sensors;
-}
-#endif
-
 std::vector<Sensor> fetch_sensors(TransceiverData *td) 
 {
   std::vector<Sensor> sensors;
@@ -69,17 +49,20 @@ std::vector<Sensor> fetch_sensors(TransceiverData *td)
       for (json::iterator it = body.begin(); it != body.end(); ++it) {
         sensors.push_back(Sensor(*it));
       }
-    } 
+    }
+  } 
   return sensors;
 }
+#endif
 
 void runReadCAN()
 {
-  std::thread runReadThread(readCAN);
-  runReadThread.join();
-  printf("Joined threads\n");
+//   std::thread runReadThread(readCAN);
+//   runReadThread.join();
+//   printf("Joined threads\n");
 
 
+}
 //   // Create a random set of data
 //   // Use the encoder function
 
@@ -95,8 +78,8 @@ void runReadCAN()
 //   }
 
 //   encode_data(0, data);
-}
 
+#if LEGATO_ON
 int openPort(const char *port) 
 {
   //Open start_can.sh
@@ -131,4 +114,5 @@ int closePort(int soc)
 	close(soc);
 	return 0;
 }
+#endif
 

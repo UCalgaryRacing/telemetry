@@ -7,7 +7,7 @@
 #include <vector>
 
 void readCAN();
-std::optional<std::vector<Sensor>> fetch_sensors(TransceiverData *td);
+// std::vector<Sensor> fetch_sensors(TransceiverData *td);
 void runReadCAN();
 int openPort(const char *port);
 int closePort(int soc);

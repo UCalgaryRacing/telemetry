@@ -17,6 +17,7 @@
 // int SERVER_PORT = 8080;
 // char *SERVER_IP = "199.116.235.51";
 
+#if 0
 typedef struct TransceiverData
 {
     std::string _api_key;
@@ -25,5 +26,6 @@ typedef struct TransceiverData
     std::string _web_address = "http://localhost:8080";
     unsigned short _client_tcp_port = -1;
 } transceiverData;
+#endif
 
 #endif
