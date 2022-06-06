@@ -1,55 +1,10 @@
-#include "encoder.h"
-#include "global.h"
+/* 
+Copyright Schulich Racing, FSAE
+Written by Justin Tijunelis
+*/ 
 
-#include <stdio.h>
-#include <vector>
-#include <mutex> 
-
+#include "vfdcp_encoder.hpp"
 #include <iostream>
-#include <string>
-
-void write_data(unsigned char *data, unsigned int size)
-{
-  mtx.lock();
-  GlobalData.data = data;
-  GlobalData.size = size;
-  mtx.unlock();
-}
-
-void encode_data(unsigned int timestamp, std::vector<int> &data) {
-  // Encode the data 
-  // Then write to the global data
-  // Use a mutex
-
-  //convert vector of ints into bytes
-  //basically encode into unsigned char*
-
-  //GlobalData.size = static_cast<int>(data.size());
-  int size = data.size();    
-  unsigned char encData[size];
-  int num = 0;
-  std::string str = "";
-
-  printf("\n\n");
-  for(int i = 0; i < size; i++)
-  {
-    std::cout << (data[i] * (i+1)) << std::endl;
-    num += data[i] * (i+1);
-  }
-  printf("\n\n");
-
-  printf("Number is: %d\nStr is: %s\n\n", num, str.c_str());
-  std::cout << "string is : " << str << std::endl;
-#if 1
-  printf("==In %s==\n", __FILE__);
-  for(const auto & x : data)
-  {
-    printf("%d", x);
-  }
-  printf("\n");
-#endif
-  //write_data(_,_);
-}
 
 std::vector<unsigned char> VFDCPEncoder::encode_data(
   unsigned int timestamp, // Can this be changed to const ref?
@@ -110,4 +65,39 @@ std::vector<unsigned char> VFDCPEncoder::encode_data(
   }
 
   return compressed_data;
+}
+
+std::tuple<unsigned int, std::vector<SensorVariantPair>> VFDCPEncoder::decode_data(
+  std::vector<unsigned char>& data, 
+  std::unordered_map<unsigned char, Sensor>& sensors
+) {
+  // Get the sensor ids and current timestamp
+  size_t sensor_count = data[0];
+  unsigned int timestamp = *(unsigned int *)(&data[1]);
+  unsigned char sensor_ids[sensor_count];
+  for (unsigned int i = 5; i < sensor_count + 5; i++) {
+    sensor_ids[i - 5] = data[i];
+  }
+
+  // Decode the data
+  int index = sensor_count + 5;
+  std::vector<SensorVariantPair> decoded{};
+  for (const unsigned char& sensor_id: sensor_ids) {
+    auto variant = sensors[sensor_id].get_variant();
+    std::visit(
+      [&](auto v) {
+        size_t size = sizeof(v);
+        unsigned char decoded_bytes[size];
+        for (size_t i = 0; i < size; i++) {
+          decoded_bytes[i] = data[index];
+          index++;
+        }
+        decltype(v) final_value = *reinterpret_cast<decltype(v)*>(&decoded_bytes);
+        decoded.emplace_back(sensor_id, final_value);
+      }, 
+      variant
+    );
+  }
+
+  return { timestamp, decoded };
 }

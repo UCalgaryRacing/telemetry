@@ -1,10 +1,7 @@
-#define LEGATO_ON 0
-#if lEGATO_ON 
 #include <stdio.h>
 #include "legato.h"
 #include <le_thread.h>
 #include "interfaces.h"
-#endif
 #include <thread>
 #include <mutex>
 #include <sys/socket.h>
@@ -14,6 +11,7 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include "transceiver.hpp"
 #include "can.hpp"
@@ -22,6 +20,7 @@
 #include "flash.hpp"
 #include "sender.hpp"
 #include "global.hpp"
+#include "vfdcp_encoder.hpp"
 
 #define DEBUG_OFF       1
 #define MAX_BUFF_SIZE   65536
@@ -35,13 +34,9 @@ std::string api_key = "6ae7867a-b5d3-4b5d-bc68-1b4a53c14296";
 //std::mutex CAN_MUTEX;
 
 
-#if LEGATO_ON 
 COMPONENT_INIT
-#else 
-int main()
-#endif
 {
-    #if LEGATO_ON
+    #if 0
 	//Set up environment
     LE_INFO("Starting CAN\n");
 	char line[256];
@@ -59,14 +54,52 @@ int main()
 
     printf("Running main.cpp\n");
 
-    // std::unique_ptr<Transceiver> T1 = std::make_unique<Transceiver>(serial_number, api_key);
-    Transceiver T1(serial_number, api_key);
-    std::vector<Sensor> sensors = T1.fetchSensors();
+    std::unique_ptr<Transceiver> transceiver = std::make_unique<Transceiver>(serial_number, api_key);
+    // Transceiver transceiver(serial_number, api_key);
+    std::vector<Sensor> sensors = transceiver->fetchSensors(); // TODO: Check if vector empty, if so, don't continue
+    // Pass back a pointer, if null, there was an error getting sensors, if empty, there are no sensors
+    // If null, retry -> do it at a timer
+    bool didSessionRequestPass = transceiver->request_session();
+    // Check if it passed, if not, try again
+    transceiver->initialize_udp();
 
-    for(const auto & sensor : sensors)
+
+    auto callback = [&](unsigned int timestamp, std::vector<SensorVariantPair> data) 
     {
-        std::cout << sensor.traits << std::endl;
+        std::vector<unsigned char> bytes = VFDCPEncoder::get().encode_data(timestamp, data);
+        for (const unsigned char x: bytes) {
+            std::cout << x;
+        }
+        std::cout << std::endl;
+        transceiver->send_vfdcp_data(bytes);
+    };
+    // Pass this callback into the read can function
+    // Get the read can function to simulate can data
+
+    unsigned int timestamp = 0;
+    for (int i = 0; i < 1000; i++) {
+        std::vector<SensorVariantPair> data{};
+        for (const auto& sensor: sensors) {
+            SensorDataVariant variant = sensor.get_variant();
+            unsigned char id = sensor.traits["smallId"];
+            data.push_back(std::make_pair(id, variant));
+        }
+        callback(timestamp, data);
+        timestamp += 33;
+        std::this_thread::sleep_for(std::chrono::milliseconds(33));
     }
+
+    transceiver->stop_session();
+    
+    // for(const auto & sensor : sensors)
+    // {
+    //     std::string sensorTraits = sensor.traits.dump();
+    //     std::cout << sensorTraits[2] << std::endl;
+    //     // sensor.get_variant();
+    //     // std::cout << sensor.traits[2] << std::endl;
+    // }
+
+    std::cout << "request_session returned: " << didSessionRequestPass << std::endl;
 
     //start threads
     std::thread receiverThread(getSensors);
@@ -86,7 +119,7 @@ int main()
     receiverThread.join();
     // senderThread.join();
     // writerThread.join();
-    #if LEGATO_ON
+    #if 0
     closePort(soc);
     #endif
 }

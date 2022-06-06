@@ -5,7 +5,9 @@ SRCS = transceiverComponent/main.cpp \
 	   transceiverComponent/reader.cpp \
 	   transceiverComponent/server.cpp \
 	   transceiverComponent/sender.cpp \
-	   transceiverComponent/transceiver.cpp
+	   transceiverComponent/transceiver.cpp \
+	   transceiverComponent/sensor.cpp \
+	   transceiverComponent/vfdcp_encoder.cpp
 
 OBJS = $(SRCS:%.cpp=%.o)
 NRT  = main

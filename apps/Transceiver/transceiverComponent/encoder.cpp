@@ -1,13 +1,6 @@
 #include "encoder.hpp"
 #include "global.hpp"
 
-#include <stdio.h>
-#include <vector>
-#include <mutex> 
-
-#include <iostream>
-#include <string>
-
 #define TESTING_OFF 0
 
 #if TESTING_OFF

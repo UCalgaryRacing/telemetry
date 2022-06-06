@@ -2,6 +2,12 @@
 #define ENCODER_H
 
 #include <vector>
+#include <tuple>
+#include <vector>
+#include <variant>
+#include <algorithm>
+#include <unordered_map>
+#include "sensor.hpp"
 
 void write_data(unsigned char *data, unsigned int size);
 void encode_data(unsigned int timestamp, std::vector<int> &data);

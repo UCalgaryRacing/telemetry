@@ -7,6 +7,9 @@ sources:
     reader.cpp
     server.cpp
     sender.cpp
+    transceiver.cpp
+    vfdcp_encoder.cpp
+    sensor.cpp
 }
 
 cxxflags:
