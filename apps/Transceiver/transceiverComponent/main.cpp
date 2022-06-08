@@ -14,7 +14,6 @@
 #include "transceiver.hpp"
 #include "can.hpp"
 #include "reader.hpp"
-#include "server.hpp"
 #include "vfdcp_encoder.hpp"
 
 #define DEBUG_OFF       1
@@ -28,6 +27,7 @@ COMPONENT_INIT {
     // Connect the hardware to LTE - TODO: Check if this works!!
     system("/legato/systems/current/bin/cm data connect");
 
+    #if 0
     // Attempt to fetch the sensors from the server
     Transceiver transceiver = Transceiver(serialNumber, apiKey, webAddress);
     std::vector<Sensor> sensors = transceiver->fetchSensors(); // TODO: Need to return a nullptr if error
@@ -47,6 +47,10 @@ COMPONENT_INIT {
         std::vector<unsigned char> bytes = encode_data(timestamp, data);
         transceiver->sendVfdcpData(bytes);
     }
+    #endif
+    std::vector<Sensor> sensors;
+    std::function<void(unsigned int, std::vector<SensorVariantPair>)> callback;
+
     CanBus canBus = CanBus(sensors, callback);
     while (!canBus.initializeCanBus()) {
         // Something is going wrong with initialization!

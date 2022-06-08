@@ -55,7 +55,7 @@ void Transceiver::sendVfdcpData(std::vector<unsigned char> &bytes) {
         buffer[i] = bytes[i];
 
     // Send the data
-    int sentBytes = sendto(
+    sendto(
         _sockfd,
         (const unsigned char *)buffer,
         bytes.size(),

@@ -13,8 +13,8 @@ class Transceiver {
   private:
     // REST request fields
     std::string _serialNumber;
-    std::string _webAddress;
     std::string _apiKey;
+    std::string _webAddress;
 
     // UDP socket fields
     int _sockfd;

@@ -7,11 +7,11 @@
 #include <mutex>
 #include <unordered_map>
 
-using ReadCallback = std::function<void(unsigned int, std::vector<SensorVariantPair>)>
+using ReadCallback = std::function<void(unsigned int, std::vector<SensorVariantPair>)>;
 
 class CanBus {
   private:
-    std::unordered_map<unsigned char, Sensor&> _sensorMap;
+    std::unordered_map<unsigned char, Sensor> _sensorMap;
     std::unordered_map<unsigned char, SensorDataVariant> _canBuffer;
     std::unordered_map<unsigned char, SensorDataVariant> _readBuffer;
     ReadCallback _callback;
@@ -48,7 +48,7 @@ class CanBus {
     /**
      * @brief 
      */
-    void closeCanBus() noexcept;
+    void closeCanBus();
 };
 
 #endif
