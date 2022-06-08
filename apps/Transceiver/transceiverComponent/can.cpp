@@ -28,14 +28,14 @@ CanBus::CanBus(std::vector<Sensor>& sensors, ReadCallback callback) {
 		if (sensors[i].traits["frequency"] > highestFrequency) {
 			highestFrequency = sensors[i].traits["frequency"];
 		}
-		this->_sensorMap.emplace(sensors[i].traits["smallId"], sensors[i]); 
+		this->_sensorSmallIdMap.emplace(sensors[i].traits["smallId"], sensors[i]); 
+		this->_sensorCanIdMap.emplace(sensors[i].traits["canId"], sensors[i]); 
 		this->_canBuffer[sensors[i].traits["smallId"]] = sensors[i].get_variant();
 	}
 	this->_frequency = highestFrequency;
 	this->_callback = callback;
 }
 
-// https://github.com/mangOH/mangOH/blob/master/linux_kernel_modules/can_common/start_can.sh
 bool CanBus::initializeCanBus() {
 	// Attempt to open the start can shell file
 	FILE* fp = popen("/home/root/start_can.sh red 2>&1", "r");  //2>&1 redirect stderr to stdout//
@@ -82,20 +82,25 @@ void CanBus::pollCanBus() {
 		FD_ZERO(&readSet);
 		FD_SET(this->_canSocket, &readSet);
 		if (select((this->_canSocket + 1), &readSet, NULL, NULL, &timeout) >= 0) {
-			std::lock_guard<std::mutex> safe_lock(_lock);
-			if (_closed) return;
+			std::lock_guard<std::mutex> safe_lock(this->_lock);
+			if (_closed) {
+				this->_canBuffer.clear();
+				return;
+			}
 
-			if (FD_ISSET(this->_canSocket, &readSet)) {
-				int rcvd = read(this->_canSocket, &canFrame, sizeof(struct can_frame));
-				if (rcvd) {
-					// unsigned char bytesLength = canFrame.can_dlc;
-					// unsigned char *bytes = canFrame.data;
-					// unsigned int canId = canFrame.can_id;
-
-					// TODO: Determine which sensor this can id is for
-					// TODO: Visit the variant of the sensor and put in the bytes data into the can buffer
-					// TODO: Add calibration here!
-				}
+			if (!FD_ISSET(this->_canSocket, &readSet)) continue;
+			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
+			unsigned char bytesLength = canFrame.can_dlc;
+			unsigned char *bytes = canFrame.data;
+			unsigned int canId = canFrame.can_id;
+			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
+				std::visit(
+					[&](auto v) {
+						decltype(v) datum = *reinterpret_cast<decltype(v)*>(&bytes);
+						this->_canBuffer[this->_sensorCanIdMap[canId]["smallId"]] = datum;
+					},
+					this->_sensorCanIdMap[canId]
+				);
 			}
 		}
 	}
@@ -106,16 +111,21 @@ void CanBus::readCanBus() {
 	unsigned volatile timestamp = 0;
 	std::unordered_set<unsigned char> changeSet;
 
-	// TODO: Start the pollCanBus function on a thread
+	// Start polling the Can bus
+	std::thread pollingThread([this]{ pollCanBus();});
 
 	while (1) {
 		// Narrow the lock scope
 		{
-			std::lock_guard<std::mutex> safe_lock(_lock);
-			if (_closed) return; // TODO: Join polling thread
+			std::lock_guard<std::mutex> safe_lock(this->_lock);
+			if (_closed) {
+				_readBuffer.clear();
+				pollingThread.join();
+				return;
+			}
 
 			// Determine which sensors we need to read from
-			for (auto it = this->_sensorMap.begin(); it != this->_sensorMap.end(); it++) {
+			for (auto it = this->_sensorSmallIdMap.begin(); it != this->_sensorSmallIdMap.end(); it++) {
 				int divisor = roundf(1000.0f / float(it->second.traits["frequency"]));
 				if (timestamp % divisor == 0) {
 					changeSet.insert((unsigned char)(it->second.traits["smallId"]));
@@ -129,8 +139,8 @@ void CanBus::readCanBus() {
 				std::vector<SensorVariantPair> data;
 				for (const unsigned char sensorSmallId: changeSet) {
 					if (this->_readBuffer.find(sensorSmallId) != this->_readBuffer.end()) {
-						double lowerBound = this->_sensorMap[sensorSmallId].traits["lowerBound"];
-						double upperBound = this->_sensorMap[sensorSmallId].traits["upperBound"];
+						double lowerBound = this->_sensorSmallIdMap[sensorSmallId].traits["lowerBound"];
+						double upperBound = this->_sensorSmallIdMap[sensorSmallId].traits["upperBound"];
 						double range = abs(upperBound - lowerBound);
 						std::visit(
 							[&](auto previousValue) {

@@ -11,7 +11,8 @@ using ReadCallback = std::function<void(unsigned int, std::vector<SensorVariantP
 
 class CanBus {
   private:
-    std::unordered_map<unsigned char, Sensor> _sensorMap;
+    std::unordered_map<unsigned int, Sensor> _sensorCanIdMap;
+    std::unordered_map<unsigned char, Sensor> _sensorSmallIdMap;
     std::unordered_map<unsigned char, SensorDataVariant> _canBuffer;
     std::unordered_map<unsigned char, SensorDataVariant> _readBuffer;
     ReadCallback _callback;

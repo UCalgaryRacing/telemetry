@@ -16,9 +16,6 @@
 #include "reader.hpp"
 #include "vfdcp_encoder.hpp"
 
-#define DEBUG_OFF       1
-#define MAX_BUFF_SIZE   65536
-
 std::string webAddress = "http://199.116.235.51:8080";
 std::string serialNumber = "7b64abb4-bfe2-4474-8a91-e746a28f8f8e";
 std::string apiKey = "6ae7867a-b5d3-4b5d-bc68-1b4a53c14296";
@@ -57,4 +54,5 @@ COMPONENT_INIT {
     }
 
     // TODO: Start readCanBus on a new thread
+    // END
 }
