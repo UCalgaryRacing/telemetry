@@ -13,106 +13,169 @@
 #include <arpa/inet.h>
 #include <linux/can.h>
 #include <net/if.h>
-#include <optional>
-
+#include <chrono>
 #include "../External Libraries/httplib.h"
 #include "../External Libraries/json.hpp"
-#include "global.hpp"
 #include "sensor.hpp"
 #include "can.hpp"
-#include "encoder.hpp"
 
-void readCAN() 
-{
+#define SIGNIFICANCE_THRESHOLD 0.00005f // 0.005% change is significant
 
-	// struct can_frame frame;
-	// int sock;
-
-	// rBytes = read(sock, &frame, sizeof(struct can_frame));
-	// if(rBytes < 0)
-	// {
-	// 	LE_INFO("reading CAN socket failed");
-	// }
+CanBus::CanBus(std::vector<Sensor>& sensors, ReadCallback callback) {
+	// Get the callback frequency, create the sensor map, and initialize the buffer
+	unsigned int highestFrequency = 0;
+	for (const Sensor& sensor: sensors) {
+		if (sensor.traits["frequency"] > highestFrequency) {
+			highestFrequency = sensor.traits["frequency"];
+		}
+		this->_sensorMap[sensor["smallId"]] = sensor;
+		this->_canBuffer[sensor["smallId"]] = sensor.get_variant();
+	}
+	this->_frequency = highestFrequency;
+	this->_callback = callback;
 }
 
-#if 0
-std::vector<Sensor> fetch_sensors(TransceiverData *td) 
-{
-  std::vector<Sensor> sensors;
-  std::string endpoint = "/api/database/sensors/thing/" + td->_serial_number;
-  httplib::Client client(td->_web_address);
-  client.set_read_timeout(100000);
-  httplib::Headers headers = {{"apiKey", td->_api_key}};
-  if (auto res = client.Get(std::move(endpoint.c_str()), headers)) {
-    if (res->status == 200) {
-      json body = json::parse(res->body).at("data");
-      for (json::iterator it = body.begin(); it != body.end(); ++it) {
-        sensors.push_back(Sensor(*it));
-      }
-    }
-  } 
-  return sensors;
-}
-#endif
+// https://github.com/mangOH/mangOH/blob/master/linux_kernel_modules/can_common/start_can.sh
+bool CanBus::initializeCanBus() {
+	// Attempt to open the start can shell file
+	char line[256];
+	FILE* fp = popen("/home/root/start_can.sh red 2>&1", "r");  //2>&1 redirect stderr to stdout//
+	if (fp == NULL) return false;
 
-void runReadCAN()
-{
-//   std::thread runReadThread(readCAN);
-//   runReadThread.join();
-//   printf("Joined threads\n");
+	// Attempt to close the shell file
+	int result = pclose(fp);
+	if (!WIFEXITED(result)) return false;
+	const int exitCode = WEXITSTATUS(result);
+	if (exitCode != 0) return false;
 
-
-}
-//   // Create a random set of data
-//   // Use the encoder function
-
-//   std::vector<int> data;
-//   //seed random number generator 
-//   srand(time(NULL));
-//   int x = (rand() % 19) + 1;
-
-//   for(int i = 0; i < x; i++)
-//   {
-//     int r = rand() % 10;
-//     data.push_back(r);
-//   }
-
-//   encode_data(0, data);
-
-#if LEGATO_ON
-int openPort(const char *port) 
-{
-  //Open start_can.sh
+	// Attempt to open the CAN socket
 	struct ifreq ifr;
-	struct sockaddr_can addr;
-
-	int soc = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	if(soc < 0) {
-		LE_INFO("err0");
-	    return (-1);
-	}
-
+	struct socaddr_can addr;
+	sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	if (sock < 0) return false;
 	addr.can_family = AF_CAN;
-	strcpy(ifr.ifr_name, port);
-	if (ioctl(soc, SIOCGIFINDEX, &ifr) < 0) {
-		LE_INFO("err1");
-	    return (-1);
+	strcpy(ifr.ifr_name, "can0");
+	if (ioctl(sock, SIOCGIFINDEX, &ifr) < 0) {
+		return false;
+	}
+	addr.can_ifindex = ifr.ifr_index;
+	fcntl(sock, F_SETFL, O_NONBLOCK);
+	if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		return false;
 	}
 
-	addr.can_ifindex = ifr.ifr_ifindex;
-	fcntl(soc, F_SETFL, O_NONBLOCK);
-	if (bind(soc, (struct sockaddr *)&addr, sizeof(addr)) < 0){
-		LE_INFO("err2");
-	    return (-1);
+	// Set the can socket and return success
+	this->_canSocket = sock;
+	return true;
+}
+
+void CanBus::openCanBus() {
+	std::lock_guard<std::mutex> safe_lock(_lock);
+  if (_closed) _closed = false;
+}
+
+// TODO: Check if can was initialized
+void CanBus::pollCanBus() {
+	struct can_frame canFrame;
+	while (1) {
+		struct timeval timeout = {1, 0};
+		fd_set readSet;
+		FD_ZERO(&readSet);
+		FD_SET(this->_canSocket);
+		if (select((this->_canSocket + 1), &readSet, NULL, NULL, &timeout) >= 0) {
+			std::lock_guard<std::mutex> safe_lock(_lock);
+			if (_closed) return;
+
+			if (FD_ISSET(this->_canSocket, &readSet)) {
+				int rcvd = read(this->_canSocket, &canFrame, sizeof(struct can_frame));
+				if (rcvd) {
+					unsigned char bytesLength = canFrame.can_dlc;
+					unsigned char *bytes = canFrame.data;
+					unsigned int canId = canFrame.can_id;
+
+					// TODO: Determine which sensor this can id is for
+					// TODO: Visit the variant of the sensor and put in the bytes data into the can buffer
+					// TODO: Add calibration here!
+				}
+			}
+		}
 	}
-
-	return soc;
 }
 
-int closePort(int soc) 
-{
-	close(soc);
-	return 0;
+// TODO: Don't allow start if CAN was not initialized
+void CanBus::readCanBus() {
+	unsigned volatile timestamp = 0;
+	std::unordered_set<unsigned char> changeSet;
+
+	// TODO: Start the pollCanBus function on a thread
+
+	while (1) {
+		// Narrow the lock scope
+		{
+			std::lock_guard<std::mutex> safe_lock(_lock);
+			if (_closed) return; // TODO: Join polling thread
+
+			// Determine which sensors we need to read from
+			for (auto it = this->_sensorMap.begin(); it != this->_sensorMap.end(); it++) {
+				int divisor = roundf(1000.0f / float(it->second.traits["frequency"]));
+				if (timestamp % this->_frequency == 0) {
+					changeSet.insert(it->second.traits["smallId"])
+				}
+			}
+
+			// Perform a read on the changeSet if the timestamp aligns with the highest frequency
+			int minDivisor = roundf(1000.0f / this->_frequency);
+			if (timestamp % minDivisor === 0) {
+				// Insert the data into a list if it is statistically significant
+				std::vector<SensorVariantPair> data;
+				for (const unsigned char& sensorSmallId: changeSet) {
+					if (this->_readBuffer.find(sensorSmallId) != this->_readBuffer.end()) {
+						double lowerBound = this->_sensorMap[sensorSmallId].traits["lowerBound"];
+						double upperBound = this->_sensorMap[sensorSmallId].traits["upperBound"];
+						double range = abs(upperBound - lowerBound);
+						std::visit(
+							[&](auto previousValue) {
+								std::visit(
+									[&](auto currentValue) {
+										double difference = double(abs(currentValue - previousValue));
+										double delta = difference / range;
+										if (delta >= SIGNIFICANCE_THRESHOLD) {
+											data.push_back({sensorSmallId, currentValue});
+										}
+									},
+									_readBuffer[sensorSmallId]
+								);
+							},
+							_canBuffer[sensorSmallId]
+						);
+					} else {
+						data.push_back({sensorSmallId, _canBuffer[sensorSmallId]});
+					}
+					this->_readBuffer[sensorSmallId] = _canBuffer[sensorSmallId];
+				}
+
+				// Execute the callback if there is new data
+				if (data.size() != 0) {
+					std::future<void> f = std::async(std::launch::async, [=]() {
+						this->_callback(timestamp, data);
+					});
+					changeSet.clear();
+				}
+			}
+
+			// Increment the timestamp
+			timestamp += 1;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
 }
-#endif
+
+void CanBus::closeCanBus() {
+	if (!_closed) {
+    {
+      std::lock_guard<std::mutex> safe_lock(_lock);
+      _closed = true;
+    }
+  }
+}
 

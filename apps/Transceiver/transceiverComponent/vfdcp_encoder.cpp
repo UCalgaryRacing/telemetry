@@ -66,38 +66,3 @@ std::vector<unsigned char> VFDCPEncoder::encode_data(
 
   return compressed_data;
 }
-
-std::tuple<unsigned int, std::vector<SensorVariantPair>> VFDCPEncoder::decode_data(
-  std::vector<unsigned char>& data, 
-  std::unordered_map<unsigned char, Sensor>& sensors
-) {
-  // Get the sensor ids and current timestamp
-  size_t sensor_count = data[0];
-  unsigned int timestamp = *(unsigned int *)(&data[1]);
-  unsigned char sensor_ids[sensor_count];
-  for (unsigned int i = 5; i < sensor_count + 5; i++) {
-    sensor_ids[i - 5] = data[i];
-  }
-
-  // Decode the data
-  int index = sensor_count + 5;
-  std::vector<SensorVariantPair> decoded{};
-  for (const unsigned char& sensor_id: sensor_ids) {
-    auto variant = sensors[sensor_id].get_variant();
-    std::visit(
-      [&](auto v) {
-        size_t size = sizeof(v);
-        unsigned char decoded_bytes[size];
-        for (size_t i = 0; i < size; i++) {
-          decoded_bytes[i] = data[index];
-          index++;
-        }
-        decltype(v) final_value = *reinterpret_cast<decltype(v)*>(&decoded_bytes);
-        decoded.emplace_back(sensor_id, final_value);
-      }, 
-      variant
-    );
-  }
-
-  return { timestamp, decoded };
-}

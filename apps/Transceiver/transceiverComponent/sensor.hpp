@@ -75,13 +75,13 @@ public:
    *    name: string, (A unique name of the sensor)
    *    id: unsigned char, (A unique identifier for the sensor, used for compression when sending data)
    *    type: char, (An character used to specify what type of data the sensor outputs; used to decode data appropriately)
-   *    last_update: unsigned long int, (A timestamp specifying the last time this sensor was fetched from the database, used to figure out which sensors to fetch data for)
+   *    lastUpdate: unsigned long int, (A timestamp specifying the last time this sensor was fetched from the database, used to figure out which sensors to fetch data for)
    *    frequency: unsigned char, (The frequency that the sensor sends updated data at)
-   *    channel_id: unsigned int, (The channel id through which the sensor data is sent, used to determine how the data is read for hardware, for CAN, used as a CAN ID)
-   *    u_calib: double, (The upper calibration level for the sensor)
-   *    l_calib: double, (The lower calibration level for the sensor)
-   *    u_bound: double, (The max data value the sensor can have)
-   *    l_bound: double, (The min data value the sensor can have)
+   *    channelId: unsigned int, (The channel id through which the sensor data is sent, used to determine how the data is read for hardware, for CAN, used as a CAN ID)
+   *    upperCalib: double, (The upper calibration level for the sensor)
+   *    lowerCalib: double, (The lower calibration level for the sensor)
+   *    upperBound: double, (The max data value the sensor can have)
+   *    lowerBound: double, (The min data value the sensor can have)
    * }
    */
   json traits;
