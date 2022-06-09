@@ -1,8 +1,11 @@
+// Copyright Schulich Racing FSAE
+// Written by Justin Tijunelis and Jon Mulyk
+
 #include "transceiver.hpp"
 
 Transceiver::~Transceiver() {}
 
-std::vector<Sensor> Transceiver::fetchSensors() {
+std::optional<std::vector<Sensor>> Transceiver::fetchSensors() {
     std::vector<Sensor> sensors;
     std::string endpoint = "/api/database/sensors/thing/" + _serialNumber;
     httplib::Client client(this->_webAddress);
@@ -14,9 +17,13 @@ std::vector<Sensor> Transceiver::fetchSensors() {
             for (json::iterator it = body.begin(); it != body.end(); ++it) {
                 sensors.push_back(Sensor(*it));
             }
+        } else {
+            return std::nullopt;
         }
+    } else {
+        return std::nullopt;
     }
-    return sensors;
+    return std::optional<std::vector<Sensor>>{sensors};
 }
 
 bool Transceiver::requestSession() {
@@ -34,7 +41,7 @@ bool Transceiver::requestSession() {
     return false;
 }
 
-bool Transceiver::initializeUDP() {
+bool Transceiver::initializeUdp() {
     struct sockaddr_in serverAddress;
     if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) return false;
     memset(&serverAddress, 0, sizeof(serverAddress));

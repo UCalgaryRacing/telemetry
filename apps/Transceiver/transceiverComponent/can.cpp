@@ -1,29 +1,11 @@
-#include "legato.h"
-#include <le_thread.h>
-#include "interfaces.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <thread>
-#include <vector>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <linux/can.h>
-#include <net/if.h>
-#include <chrono>
-#include "../External Libraries/httplib.h"
-#include "../External Libraries/json.hpp"
-#include "sensor.hpp"
-#include "can.hpp"
-#include <unordered_set>
-#include <future>
+// Copyright Schulich Racing, FSAE
+// Written by Justin Tijunelis and Jon Mulyk
 
-#define SIGNIFICANCE_THRESHOLD 0.00005f // 0.005% change is significant
+#include "can.hpp"
 
 CanBus::CanBus(std::vector<Sensor>& sensors, ReadCallback callback) {
 	// Get the callback frequency, create the sensor map, and initialize the buffer
 	unsigned int highestFrequency = 0;
-	// for (Sensor& sensor: sensors) {
 	for(unsigned int i; i < sensors.size(); ++i) {
 		if (sensors[i].traits["frequency"] > highestFrequency) {
 			highestFrequency = sensors[i].traits["frequency"];
@@ -38,14 +20,7 @@ CanBus::CanBus(std::vector<Sensor>& sensors, ReadCallback callback) {
 
 bool CanBus::initializeCanBus() {
 	// Attempt to open the start can shell file
-	FILE* fp = popen("/home/root/start_can.sh red 2>&1", "r");  //2>&1 redirect stderr to stdout//
-	if (fp == NULL) return false;
-
-	// Attempt to close the shell file
-	int result = pclose(fp);
-	if (!WIFEXITED(result)) return false;
-	const int exitCode = WEXITSTATUS(result);
-	if (exitCode != 0) return false;
+	system("sh /home/root/start_can.sh red");
 
 	// Attempt to open the CAN socket
 	struct ifreq ifr;
@@ -90,16 +65,17 @@ void CanBus::pollCanBus() {
 
 			if (!FD_ISSET(this->_canSocket, &readSet)) continue;
 			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
-			unsigned char bytesLength = canFrame.can_dlc;
+			// unsigned char bytesLength = canFrame.can_dlc;
+			// Critical area
 			unsigned char *bytes = canFrame.data;
 			unsigned int canId = canFrame.can_id;
 			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
 				std::visit(
 					[&](auto v) {
 						decltype(v) datum = *reinterpret_cast<decltype(v)*>(&bytes);
-						this->_canBuffer[this->_sensorCanIdMap[canId]["smallId"]] = datum;
+						this->_canBuffer[this->_sensorCanIdMap[canId].traits["smallId"]] = datum;
 					},
-					this->_sensorCanIdMap[canId]
+					this->_sensorCanIdMap[canId].get_variant()
 				);
 			}
 		}

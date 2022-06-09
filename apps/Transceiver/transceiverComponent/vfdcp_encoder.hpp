@@ -1,7 +1,5 @@
-/* 
-Copyright Schulich Racing, FSAE
-Written by Justin Tijunelis
-*/ 
+// Copyright Schulich Racing, FSAE
+// Written by Justin Tijunelis
 
 #ifndef VFDCP_ENCODER_H
 #define VFDCP_ENCODER_H

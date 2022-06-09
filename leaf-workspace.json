@@ -4,7 +4,14 @@
         "Telemetry": {
             "packages": {
                 "swi-wp76": "5.0.0"
+            },
+            "env": {
+                "LEGATO_SRC": "tag"
             }
         }
+    },
+    "env": {
+        "LEGATO_CLONE": "${LEAF_WORKSPACE}/legato-src",
+        "LEGATO_DEF_FILE": "${LEAF_WORKSPACE}/red.sdef"
     }
 }

@@ -1,6 +1,6 @@
-// sandboxed: false
-// start: manual
-// version: 1.0
+sandboxed: false
+start: manual
+version: 1.0
 
 executables: 
 {
@@ -12,16 +12,5 @@ processes:
 	run: 
 	{
 		( transceiver )
-	}
-}
-
-requires: 
-{
-	file: 
-	{
-		/bin/sh /usr/local/bin/
-		/sbin/ip /usr/local/bin/
-		/sbin/ifconfig /usr/local/bin/
-		/legato/systems/current/bin/kmod /usr/local/bin/
 	}
 }

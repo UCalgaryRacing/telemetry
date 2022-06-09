@@ -129,7 +129,7 @@ Sensor_t;
 //--------------------------------------------------------------------------------------------------
 
 /// True if the AirVantage session is active.  False if not.
-static bool IsAvSessionActive = false;
+static bool isConnectedToLTE = false;
 
 
 /// Cloud push tracking record for the accelerometer.
@@ -987,7 +987,7 @@ static void AvSessionStateHandler
         case LE_AVDATA_SESSION_STARTED:
         {
             // Temporary workaround for the session state problem.
-            if (IsAvSessionActive)
+            if (isConnectedToLTE)
             {
                 LE_ERROR("Received 'session started' indication when already started.");
             }
@@ -995,7 +995,7 @@ static void AvSessionStateHandler
             {
                 LE_INFO("AirVantage(tm) session started");
 
-                IsAvSessionActive = true;
+                isConnectedToLTE = true;
             }
             break;
         }
@@ -1004,7 +1004,7 @@ static void AvSessionStateHandler
         {
             LE_INFO("AirVantage(tm) session stopped");
 
-            IsAvSessionActive = false;
+            isConnectedToLTE = false;
 
             break;
         }

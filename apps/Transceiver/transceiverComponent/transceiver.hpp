@@ -1,3 +1,6 @@
+// Copyright Schulich Racing FSAE
+// Written by Justin Tijunelis and Jon Mulyk
+
 #ifndef TRANSCEIVER_H
 #define TRANSCEIVER_H
 
@@ -5,8 +8,9 @@
 #include <string> 
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "../External Libraries/httplib.h"
-#include "../External Libraries/json.hpp"
+#include <optional>
+#include "../inc/httplib.h"
+#include "../inc/json.hpp"
 #include "sensor.hpp"
 
 class Transceiver {
@@ -30,7 +34,7 @@ class Transceiver {
     /**
      * @brief Fetch the entire list of sensors for the particular serial number of a "thing."
      */
-    std::vector<Sensor> fetchSensors();
+    std::optional<std::vector<Sensor>> fetchSensors();
 
      /**
      * @brief Requests the server to start a session, gets a UDP port to send to if successful. 
@@ -41,7 +45,7 @@ class Transceiver {
     /**
      * @brief Opens the UDP socket through which compressed data is sent. 
      */
-    bool initializeUDP();
+    bool initializeUdp();
 
     /**
      * @brief Closes the UDP socket " " " "

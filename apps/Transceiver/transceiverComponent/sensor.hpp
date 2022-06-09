@@ -1,16 +1,12 @@
-/* 
-Copyright Schulich Racing, FSAE
-Written by Justin Tijunelis
-*/ 
+// Copyright Schulich Racing, FSAE
+// Written by Justin Tijunelis
 
 #ifndef SENSOR_H
 #define SENSOR_H
 
 #include <string>
 #include <variant>
-#include <exception>
-#include <set>
-#include "../External Libraries/json.hpp"
+#include "../inc/json.hpp"
 
 using json = nlohmann::json;
 

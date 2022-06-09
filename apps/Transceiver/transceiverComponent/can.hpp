@@ -1,7 +1,19 @@
 #ifndef CAN_H
 #define CAN_H
 
+#include "../inc/httplib.h"
+#include "../inc/json.hpp"
 #include "sensor.hpp"
+#include "constants.h"
+#include "legato.h"
+#include <time.h>
+#include <thread>
+#include <vector>
+#include <chrono>
+#include <future>
+#include <net/if.h>
+#include <linux/can.h>
+#include <unordered_set>
 #include <optional>
 #include <vector>
 #include <mutex>

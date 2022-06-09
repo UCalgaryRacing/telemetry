@@ -1,16 +1,29 @@
 {
-    "configurations": [
-        {
-            "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "cStandard": "gnu17",
-            "cppStandard": "gnu++14",
-            "intelliSenseMode": "linux-gcc-x64"
-        }
-    ],
-    "version": 4
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu17",
+      "cppStandard": "gnu++14",
+      "intelliSenseMode": "linux-gcc-x64"
+    },
+    {
+      "name": "Legato",
+      "includePath": [
+        "/home/justintijunelis/Documents/telemetry/legato-src/legato/framework/include",
+        "/home/justintijunelis/Documents/telemetry/legato-src/legato/build/wp76xx/framework/include",
+        "/home/justintijunelis/Documents/telemetry/_build_red/wp76xx/**"
+      ],
+      "defines": [],
+      "intelliSenseMode": "gcc-x64",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "compilerPath": "/home/justintijunelis/Documents/telemetry/leaf-data/Telemetry/wp76-toolchain/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi/arm-poky-linux-gnueabi-gcc --sysroot /home/justintijunelis/Documents/telemetry/leaf-data/Telemetry/wp76-toolchain/sysroots/armv7a-neon-poky-linux-gnueabi"
+    }
+  ],
+  "version": 4
 }

@@ -1,10 +1,7 @@
-/* 
-Copyright Schulich Racing, FSAE
-Written by Justin Tijunelis
-*/ 
+// Copyright Schulich Racing, FSAE
+// Written by Justin Tijunelis
 
 #include "vfdcp_encoder.hpp"
-#include <iostream>
 
 std::vector<unsigned char> encode_data(
   unsigned int timestamp, // Can this be changed to const ref?

@@ -1,0 +1,13 @@
+// Copyright Schulich Racing, FSAE
+// Written by Justin Tijunelis
+
+#ifndef CONSTANTS
+#define CONSTANTS
+
+#define WEB_SERVER_ENDPOINT XXX
+#define SERIAL_NUMBER XXX
+#define API_KEY XXX
+
+#define SIGNIFICANCE_THRESHOLD XXX // 0-1
+
+#endif

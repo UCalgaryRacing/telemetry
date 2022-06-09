@@ -2,7 +2,6 @@ sources:
 {
     main.cpp
     can.cpp
-    reader.cpp
     transceiver.cpp
     vfdcp_encoder.cpp
     sensor.cpp

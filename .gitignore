@@ -1,1 +1,8 @@
 /.metadata/
+build
+apps/Transceiver/transceiverComponent/constants.h
+leaf-data
+**/_build_*
+legato-src
+RemoteSystemsTempFiles
+samples

@@ -1,58 +1,44 @@
-#include <stdio.h>
+// Copyright Schulich Racing, FSAE
+// Written by Jon Mulyk and Justin Tijunelis
+
 #include "legato.h"
-#include <le_thread.h>
-#include "interfaces.h"
 #include <thread>
-#include <mutex>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <linux/can.h>
-#include <net/if.h>
-#include <iostream>
-#include <string>
-#include <chrono>
-#include "transceiver.hpp"
+#include <optional>
+#include <vector>
 #include "can.hpp"
-#include "reader.hpp"
+#include "constants.h"
+#include "transceiver.hpp"
 #include "vfdcp_encoder.hpp"
 
-std::string webAddress = "http://199.116.235.51:8080";
-std::string serialNumber = "7b64abb4-bfe2-4474-8a91-e746a28f8f8e";
-std::string apiKey = "6ae7867a-b5d3-4b5d-bc68-1b4a53c14296";
-
 COMPONENT_INIT {
-    // Connect the hardware to LTE - TODO: Check if this works!!
-    system("/legato/systems/current/bin/cm data connect");
+	// Connect to LTE
+    system("sh /home/root/start_connect.sh");
 
-    #if 0
     // Attempt to fetch the sensors from the server
-    Transceiver transceiver = Transceiver(serialNumber, apiKey, webAddress);
-    std::vector<Sensor> sensors = transceiver->fetchSensors(); // TODO: Need to return a nullptr if error
-    if (sensors.size() == 0) {
-        // There are no sensors for this!
-        // What do we do? Probably just nothing
+    Transceiver transceiver = Transceiver(SERIAL_NUMBER, API_KEY, WEB_SERVER_ENDPOINT);
+    std::optional<std::vector<Sensor>> sensors = std::nullopt; 
+    while (!sensors.has_value()) {
+        sensors = transceiver.fetchSensors();
+    }
+
+    // If there are no sensors, there is no point in continuing
+    if (sensors.value().size() == 0) {
+        return;
     }
 
     // Attempt to start a session with the server
-    while (!transceiver->requestSession()) {
-        // Wait until we can start a session!
-    }
-    transceiver->initializeUdp();
+    while (!transceiver.requestSession());
+    transceiver.initializeUdp();
 
     // Attempt to start the CAN bus
     auto callback = [&](unsigned int timestamp, std::vector<SensorVariantPair> data) {
         std::vector<unsigned char> bytes = encode_data(timestamp, data);
-        transceiver->sendVfdcpData(bytes);
-    }
-    #endif
-    std::vector<Sensor> sensors;
-    std::function<void(unsigned int, std::vector<SensorVariantPair>)> callback;
+        transceiver.sendVfdcpData(bytes);
+    };
+    CanBus canBus = CanBus(sensors.value(), callback);
+    while (!canBus.initializeCanBus());
 
-    CanBus canBus = CanBus(sensors, callback);
-    while (!canBus.initializeCanBus()) {
-        // Something is going wrong with initialization!
-    }
-
-    // TODO: Start readCanBus on a new thread
-    // END
+    // Start the CAN reading thread
+    std::thread canReadingThread([&]{ canBus.readCanBus(); });
+    canReadingThread.join();
 }
