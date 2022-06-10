@@ -4,6 +4,7 @@
 #include "can.hpp"
 #include <iostream>
 #include <iomanip>
+#define DEBUG = 1
 
 CanBus::CanBus(std::vector<Sensor> sensors) {
 	// Get the callback frequency, create the sensor map, and initialize the buffer
@@ -46,7 +47,7 @@ bool CanBus::initialize() {
 }
 
 bool CanBus::engineStarted() {
-	// If the RPM goes over 1000, we can start
+	// If the RPM goes over 1000, the engine is surely on...
 	if (this->_canBuffer.find(7) != this->_canBuffer.end()) {
 		return std::get<unsigned short>(this->_canBuffer[7]) > 1000.0f;
 	} else {
@@ -84,6 +85,11 @@ void CanBus::poll() {
 			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
 			unsigned char *bytes = canFrame.data;
 			unsigned int canId = canFrame.can_id;
+			#if DEBUG = 1
+			std::stringstream stream;
+			stream << std::hex << canId;
+			std::cout << result(stream.str()) << std::endl;
+			#endif
 			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
 				for (const Sensor& sensor: this->_sensorCanIdMap[canId]) {
 					unsigned int offset = sensor.traits["canOffset"];
@@ -93,7 +99,6 @@ void CanBus::poll() {
 							if (this->_translationIds.find(sensor.traits["smallId"]) != this->_translationIds.end()) {
 								this->translate(datum);
 							}
-							std::cout << sensor.traits["name"] << ": " << datum << std::endl;
 							this->_canBuffer[sensor.traits["smallId"]] = datum;
 						},
 						sensor.getVariant()
