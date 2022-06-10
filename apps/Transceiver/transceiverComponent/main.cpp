@@ -5,6 +5,7 @@
 #include <thread>
 #include <iostream>
 #include <optional>
+#include <chrono>
 #include <vector>
 #include "can.hpp"
 #include "constants.h"
@@ -14,7 +15,17 @@
 COMPONENT_INIT {
 	// Connect to LTE and start the CAN driver
     system("sh /home/root/start_connect.sh &");
-    for (int i = 0; i < 3; i++) system("sh /home/root/start_can.sh red &");
+    while (1) {
+        char line[256];
+        FILE* fp = popen("/home/root/start_can.sh red 2>&1", "r");
+        LE_ASSERT(fp != NULL);
+        if (fp == NULL) continue;
+        while (fgets(line, sizeof(line), fp) != NULL);
+        int result = pclose(fp);
+        if (!WIFEXITED(result)) continue;
+        if (WEXITSTATUS(result) != 0) continue;
+        break;
+    }
 
     // Attempt to fetch the sensors from the server
     Transceiver transceiver = Transceiver(SERIAL_NUMBER, API_KEY, WEB_SERVER_ENDPOINT);
@@ -26,11 +37,14 @@ COMPONENT_INIT {
     // If there are no sensors, there is no point in continuing
     if (sensors.value().size() == 0) return;
 
-    // Attempt to start the CAN bus
-    std::cout << "Starting can" << std::endl;
+    // Start polling the CAN bus
     CanBus canBus = CanBus(sensors.value());
     while (!canBus.initialize());
     canBus.open();
+	std::thread pollingThread([&]{ canBus.poll(); });
+
+    // Wait for the engine to start before starting telemetry
+    while (!canBus.engineStarted());
 
     // Attempt to start a session with the server
     std::cout << "requesting session" << std::endl;
@@ -42,6 +56,21 @@ COMPONENT_INIT {
         std::vector<unsigned char> bytes = encode_data(timestamp, data);
         transceiver.sendVfdcpData(bytes);
     };
-    std::cout << "Starting can" << std::endl;
-    canBus.readAndTrigger(callback);
+    canBus.decimateFrequency(callback);
+    pollingThread.join();
 }
+
+// // TESTING
+// std::vector<SensorVariantPair> data{};
+// for (auto sensor: sensors.value()) {
+//     SensorVariantPair datum = std::make_pair(sensor.traits["smallId"], sensor.get_variant());
+//     data.push_back(datum);
+// }
+// transceiver.initializeUdp();
+// for (unsigned int i = 0; i < 1000; i++) {
+//     std::vector<unsigned char> bytes = encode_data(i, data);
+//     transceiver.sendVfdcpData(bytes);
+//     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+// }
+
+// return;

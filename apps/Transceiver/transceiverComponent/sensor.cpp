@@ -24,7 +24,7 @@ Sensor::Sensor(std::vector<std::string> keys, std::vector<std::string> values) {
 }
 
 // There must be a better way to do this too...
-SensorDataVariant Sensor::get_variant() const {
+SensorDataVariant Sensor::getVariant() const {
     SensorDataVariant variant;
     std::string type = traits["type"];
     switch (type[0]) {

@@ -40,11 +40,6 @@ class CanBus {
      */
     void translate(auto& data);
 
-    /**
-     * @brief 
-     */
-    void poll();
-
   public:
     CanBus() = delete;
     CanBus(std::vector<Sensor> sensors);
@@ -57,12 +52,22 @@ class CanBus {
     /**
      * @brief 
      */
+    bool engineStarted();
+
+    /**
+     * @brief 
+     */
     void open();
 
     /**
      * @brief 
      */
-    void readAndTrigger(ReadCallback callback);
+    void poll();
+
+    /**
+     * @brief 
+     */
+    void decimateFrequency(ReadCallback callback);
 
     /**
      * @brief 

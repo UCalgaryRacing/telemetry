@@ -89,7 +89,7 @@ public:
   /**
    * @brief Returns a variant that can be used to deduce the sensor's data type.
    */
-  SensorDataVariant get_variant() const;
+  SensorDataVariant getVariant() const;
 };
 
 #endif

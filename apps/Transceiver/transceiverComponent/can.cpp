@@ -18,7 +18,7 @@ CanBus::CanBus(std::vector<Sensor> sensors) {
 		} else {
 			this->_sensorCanIdMap.emplace(sensors[i].traits["canId"], std::vector<Sensor>{sensors[i]}); 
 		}
-		this->_canBuffer[sensors[i].traits["smallId"]] = sensors[i].get_variant();
+		this->_canBuffer[sensors[i].traits["smallId"]] = sensors[i].getVariant();
 	}
 	this->_frequency = highestFrequency;
 }
@@ -43,6 +43,15 @@ bool CanBus::initialize() {
 	// Set the can socket and return success
 	this->_canSocket = sock;
 	return true;
+}
+
+bool CanBus::engineStarted() {
+	// If the RPM goes over 1000, we can start
+	if (this->_canBuffer.find(7) != this->_canBuffer.end()) {
+		return std::get<unsigned short>(this->_canBuffer[7]) > 1000.0f;
+	} else {
+		return false;
+	}
 }
 
 void CanBus::open() {
@@ -87,7 +96,7 @@ void CanBus::poll() {
 							std::cout << sensor.traits["name"] << ": " << datum << std::endl;
 							this->_canBuffer[sensor.traits["smallId"]] = datum;
 						},
-						sensor.get_variant()
+						sensor.getVariant()
 					);
 				}
 			}
@@ -95,12 +104,9 @@ void CanBus::poll() {
 	}
 }
 
-void CanBus::readAndTrigger(ReadCallback callback) {
+void CanBus::decimateFrequency(ReadCallback callback) {
 	unsigned volatile timestamp = 0;
 	std::unordered_set<unsigned char> changeSet;
-
-	// Start polling the Can bus
-	std::thread pollingThread([&]{ this->poll(); });
 
 	while (1) {
 		// Narrow the lock scope
@@ -108,7 +114,6 @@ void CanBus::readAndTrigger(ReadCallback callback) {
 			std::lock_guard<std::mutex> safe_lock(this->_lock);
 			if (_closed) {
 				_readBuffer.clear();
-				pollingThread.join();
 				return;
 			}
 

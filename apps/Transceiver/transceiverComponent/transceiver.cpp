@@ -61,7 +61,7 @@ void Transceiver::sendVfdcpData(std::vector<unsigned char> &bytes) {
         buffer[i] = bytes[i];
 
     // Send the data
-    int sent = sendto(
+    sendto(
         this->_sockfd,
         (const unsigned char *)buffer,
         bytes.size(),
@@ -69,5 +69,4 @@ void Transceiver::sendVfdcpData(std::vector<unsigned char> &bytes) {
         (const struct sockaddr *)&this->_serverAddress,
         sizeof(this->_serverAddress)
     );
-    std::cout << sent << std::endl;
 }
