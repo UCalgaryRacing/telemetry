@@ -24,9 +24,6 @@ CanBus::CanBus(std::vector<Sensor> sensors) {
 }
 
 bool CanBus::initialize() {
-	// Attempt to open the start can shell file
-	system("sh /home/root/start_can.sh red &");
-
 	// Attempt to open the CAN socket
 	struct ifreq ifr;
 	struct sockaddr_can addr;
@@ -45,7 +42,6 @@ bool CanBus::initialize() {
 
 	// Set the can socket and return success
 	this->_canSocket = sock;
-	std::cout << "The can port is: " << this->_canSocket << std::endl;
 	return true;
 }
 
@@ -85,9 +81,10 @@ void CanBus::poll() {
 					std::visit(
 						[&](auto v) {
 							decltype(v) datum = *(reinterpret_cast<decltype(v)*>(bytes + offset));
-							if (this->_translationIds.find(canId) != this->_translationIds.end()) {
+							if (this->_translationIds.find(sensor.traits["smallId"]) != this->_translationIds.end()) {
 								this->translate(datum);
 							}
+							std::cout << sensor.traits["name"] << ": " << datum << std::endl;
 							this->_canBuffer[sensor.traits["smallId"]] = datum;
 						},
 						sensor.get_variant()
@@ -98,7 +95,6 @@ void CanBus::poll() {
 	}
 }
 
-// TODO: Don't allow start if CAN was not initialized
 void CanBus::readAndTrigger(ReadCallback callback) {
 	unsigned volatile timestamp = 0;
 	std::unordered_set<unsigned char> changeSet;
@@ -131,18 +127,18 @@ void CanBus::readAndTrigger(ReadCallback callback) {
 				std::vector<SensorVariantPair> data;
 				for (const unsigned char sensorSmallId: changeSet) {
 					if (this->_readBuffer.find(sensorSmallId) != this->_readBuffer.end()) {
-						// double lowerBound = this->_sensorSmallIdMap[sensorSmallId].traits["lowerBound"];
-						// double upperBound = this->_sensorSmallIdMap[sensorSmallId].traits["upperBound"];
-						// double range = abs(upperBound - lowerBound);
+						double lowerBound = this->_sensorSmallIdMap[sensorSmallId].traits["lowerBound"];
+						double upperBound = this->_sensorSmallIdMap[sensorSmallId].traits["upperBound"];
+						double range = abs(upperBound - lowerBound);
 						std::visit(
 							[&](auto previousValue) {
 								std::visit(
 									[&](auto currentValue) {
-										//double difference = double(abs((double)(currentValue - previousValue)));
-										//double delta = difference / range;
-										//if (delta >= SIGNIFICANCE_THRESHOLD) {
+										double difference = double(abs((double)(currentValue - previousValue)));
+										double delta = difference / range;
+										if (delta >= SIGNIFICANCE_THRESHOLD) {
 											data.push_back({sensorSmallId, currentValue});
-										//}
+										}
 									},
 									_readBuffer[sensorSmallId]
 								);

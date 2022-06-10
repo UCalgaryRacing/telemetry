@@ -42,12 +42,11 @@ bool Transceiver::requestSession() {
 }
 
 bool Transceiver::initializeUdp() {
-    struct sockaddr_in serverAddress;
     if ((this->_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) return false;
-    memset(&this->serverAddress, 0, sizeof(this->serverAddress));
-    this->serverAddress.sin_family = AF_INET;
-    this->serverAddress.sin_port = htons(_remoteUdpPort);
-    this->serverAddress.sin_addr.s_addr = inet_addr(_remoteUdpAddress.c_str());
+    memset(&this->_serverAddress, 0, sizeof(this->_serverAddress));
+    this->_serverAddress.sin_family = AF_INET;
+    this->_serverAddress.sin_port = htons(this->_remoteUdpPort);
+    this->_serverAddress.sin_addr.s_addr = inet_addr(this->_remoteUdpAddress.c_str());
     return true;
 }
 
@@ -63,13 +62,12 @@ void Transceiver::sendVfdcpData(std::vector<unsigned char> &bytes) {
 
     // Send the data
     int sent = sendto(
-        _sockfd,
+        this->_sockfd,
         (const unsigned char *)buffer,
         bytes.size(),
         0,
-        (const struct sockaddr *)&_serverAddress,
-        sizeof(_serverAddress)
+        (const struct sockaddr *)&this->_serverAddress,
+        sizeof(this->_serverAddress)
     );
-    perror("Socket error");
     std::cout << sent << std::endl;
 }

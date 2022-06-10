@@ -28,7 +28,7 @@ class CanBus {
     std::unordered_map<unsigned char, Sensor> _sensorSmallIdMap;
     std::unordered_map<unsigned char, SensorDataVariant> _canBuffer;
     std::unordered_map<unsigned char, SensorDataVariant> _readBuffer;
-    std::unordered_set<unsigned int> _translationIds{0x0cfff048, 0x0cfff148, 0x0cfff248, 0x0cfff348, 0x0cfff448, 0x0cfff548, 0x0cfff648, 0x0cfff748, 0x0cfff848, 0x0cfffA48, 0x0cfffB48, 0x0cfffc48, 0x0cfffd48, 0x0cfffe48, 0x0cffd048};
+    std::unordered_set<unsigned int> _translationIds{11, 12, 14, 15, 16, 17, 18, 13, 19, 20, 21, 22, 23, 24, 25, 8, 27, 28, 9, 10, 29, 30, 26, 31, 32, 33, 34, 35, 36, 37, 38};
     unsigned char _frequency; // Is this the right type?
     bool _closed;
     int _canSocket;
