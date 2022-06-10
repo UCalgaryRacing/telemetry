@@ -3,6 +3,7 @@
 
 #include "legato.h"
 #include <thread>
+#include <iostream>
 #include <optional>
 #include <vector>
 #include "can.hpp"
@@ -12,7 +13,7 @@
 
 COMPONENT_INIT {
 	// Connect to LTE
-    system("sh /home/root/start_connect.sh");
+    system("sh /home/root/start_connect.sh &");
 
     // Attempt to fetch the sensors from the server
     Transceiver transceiver = Transceiver(SERIAL_NUMBER, API_KEY, WEB_SERVER_ENDPOINT);
@@ -22,23 +23,21 @@ COMPONENT_INIT {
     }
 
     // If there are no sensors, there is no point in continuing
-    if (sensors.value().size() == 0) {
-        return;
-    }
+    if (sensors.value().size() == 0) return;
+
+    // Attempt to start the CAN bus
+    CanBus canBus = CanBus(sensors.value());
+    while (!canBus.initialize());
+    canBus.open();
 
     // Attempt to start a session with the server
     while (!transceiver.requestSession());
     transceiver.initializeUdp();
 
-    // Attempt to start the CAN bus
+    // Start the CAN reading thread
     auto callback = [&](unsigned int timestamp, std::vector<SensorVariantPair> data) {
         std::vector<unsigned char> bytes = encode_data(timestamp, data);
         transceiver.sendVfdcpData(bytes);
     };
-    CanBus canBus = CanBus(sensors.value(), callback);
-    while (!canBus.initializeCanBus());
-
-    // Start the CAN reading thread
-    std::thread canReadingThread([&]{ canBus.readCanBus(); });
-    canReadingThread.join();
+    canBus.readAndTrigger(callback);
 }

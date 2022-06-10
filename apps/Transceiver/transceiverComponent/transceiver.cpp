@@ -33,8 +33,8 @@ bool Transceiver::requestSession() {
     if (auto res = client.Get(std::move(endpoint.c_str()), headers)) {
         if (res->status == 200) {
             json response = json::parse(res->body);
-            _remoteUdpPort = response.at("port");
-            _remoteUdpAddress = response.at("address");
+            this->_remoteUdpPort = response.at("port");
+            this->_remoteUdpAddress = response.at("address");
             return true;
         }
     }
@@ -43,11 +43,11 @@ bool Transceiver::requestSession() {
 
 bool Transceiver::initializeUdp() {
     struct sockaddr_in serverAddress;
-    if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) return false;
-    memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(_remoteUdpPort);
-    serverAddress.sin_addr.s_addr = inet_addr(_remoteUdpAddress.c_str());
+    if ((this->_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) return false;
+    memset(&this->serverAddress, 0, sizeof(this->serverAddress));
+    this->serverAddress.sin_family = AF_INET;
+    this->serverAddress.sin_port = htons(_remoteUdpPort);
+    this->serverAddress.sin_addr.s_addr = inet_addr(_remoteUdpAddress.c_str());
     return true;
 }
 
@@ -62,7 +62,7 @@ void Transceiver::sendVfdcpData(std::vector<unsigned char> &bytes) {
         buffer[i] = bytes[i];
 
     // Send the data
-    sendto(
+    int sent = sendto(
         _sockfd,
         (const unsigned char *)buffer,
         bytes.size(),
@@ -70,4 +70,6 @@ void Transceiver::sendVfdcpData(std::vector<unsigned char> &bytes) {
         (const struct sockaddr *)&_serverAddress,
         sizeof(_serverAddress)
     );
+    perror("Socket error");
+    std::cout << sent << std::endl;
 }

@@ -164,7 +164,7 @@ void *read_port(void* vargp){
 	        if (!read_can_port) { break; }
 	        if (FD_ISSET(soc, &readSet)) {
 	            recvbytes = read(soc, &frame_rd, sizeof(struct can_frame));
-	            if(recvbytes) {
+	            if (recvbytes) {
 	            	pthread_mutex_lock(&lock);
 	            	unsigned char* dataString = frame_rd.data;
 	            	char buffer [9];

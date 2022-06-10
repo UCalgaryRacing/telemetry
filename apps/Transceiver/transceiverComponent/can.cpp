@@ -2,25 +2,30 @@
 // Written by Justin Tijunelis and Jon Mulyk
 
 #include "can.hpp"
+#include <iostream>
+#include <iomanip>
 
-CanBus::CanBus(std::vector<Sensor>& sensors, ReadCallback callback) {
+CanBus::CanBus(std::vector<Sensor> sensors) {
 	// Get the callback frequency, create the sensor map, and initialize the buffer
 	unsigned int highestFrequency = 0;
-	for(unsigned int i; i < sensors.size(); ++i) {
+	for (unsigned int i = 0; i < sensors.size(); ++i) {
 		if (sensors[i].traits["frequency"] > highestFrequency) {
 			highestFrequency = sensors[i].traits["frequency"];
 		}
 		this->_sensorSmallIdMap.emplace(sensors[i].traits["smallId"], sensors[i]); 
-		this->_sensorCanIdMap.emplace(sensors[i].traits["canId"], sensors[i]); 
+		if (this->_sensorCanIdMap.find(sensors[i].traits["canId"]) != this->_sensorCanIdMap.end()) {
+			this->_sensorCanIdMap[sensors[i].traits["canId"]].push_back(sensors[i]);
+		} else {
+			this->_sensorCanIdMap.emplace(sensors[i].traits["canId"], std::vector<Sensor>{sensors[i]}); 
+		}
 		this->_canBuffer[sensors[i].traits["smallId"]] = sensors[i].get_variant();
 	}
 	this->_frequency = highestFrequency;
-	this->_callback = callback;
 }
 
-bool CanBus::initializeCanBus() {
+bool CanBus::initialize() {
 	// Attempt to open the start can shell file
-	system("sh /home/root/start_can.sh red");
+	system("sh /home/root/start_can.sh red &");
 
 	// Attempt to open the CAN socket
 	struct ifreq ifr;
@@ -40,16 +45,25 @@ bool CanBus::initializeCanBus() {
 
 	// Set the can socket and return success
 	this->_canSocket = sock;
+	std::cout << "The can port is: " << this->_canSocket << std::endl;
 	return true;
 }
 
-void CanBus::openCanBus() {
+void CanBus::open() {
 	std::lock_guard<std::mutex> safe_lock(_lock);
   if (_closed) _closed = false;
 }
 
-// TODO: Check if can was initialized
-void CanBus::pollCanBus() {
+void CanBus::translate(auto& datum) {
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&datum);
+	unsigned char low = bytes[0];
+	unsigned char high = bytes[1];
+	int num = high * 256 + low;
+	if (num > 32767) num -= 65536;
+	datum = (decltype(datum))num;
+}
+
+void CanBus::poll() {
 	struct can_frame canFrame;
 	while (1) {
 		struct timeval timeout = {1, 0};
@@ -62,33 +76,35 @@ void CanBus::pollCanBus() {
 				this->_canBuffer.clear();
 				return;
 			}
-
-			if (!FD_ISSET(this->_canSocket, &readSet)) continue;
 			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
-			// unsigned char bytesLength = canFrame.can_dlc;
-			// Critical area
 			unsigned char *bytes = canFrame.data;
 			unsigned int canId = canFrame.can_id;
 			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
-				std::visit(
-					[&](auto v) {
-						decltype(v) datum = *reinterpret_cast<decltype(v)*>(&bytes);
-						this->_canBuffer[this->_sensorCanIdMap[canId].traits["smallId"]] = datum;
-					},
-					this->_sensorCanIdMap[canId].get_variant()
-				);
+				for (const Sensor& sensor: this->_sensorCanIdMap[canId]) {
+					unsigned int offset = sensor.traits["canOffset"];
+					std::visit(
+						[&](auto v) {
+							decltype(v) datum = *(reinterpret_cast<decltype(v)*>(bytes + offset));
+							if (this->_translationIds.find(canId) != this->_translationIds.end()) {
+								this->translate(datum);
+							}
+							this->_canBuffer[sensor.traits["smallId"]] = datum;
+						},
+						sensor.get_variant()
+					);
+				}
 			}
 		}
 	}
 }
 
 // TODO: Don't allow start if CAN was not initialized
-void CanBus::readCanBus() {
+void CanBus::readAndTrigger(ReadCallback callback) {
 	unsigned volatile timestamp = 0;
 	std::unordered_set<unsigned char> changeSet;
 
 	// Start polling the Can bus
-	std::thread pollingThread([this]{ pollCanBus();});
+	std::thread pollingThread([&]{ this->poll(); });
 
 	while (1) {
 		// Narrow the lock scope
@@ -115,18 +131,18 @@ void CanBus::readCanBus() {
 				std::vector<SensorVariantPair> data;
 				for (const unsigned char sensorSmallId: changeSet) {
 					if (this->_readBuffer.find(sensorSmallId) != this->_readBuffer.end()) {
-						double lowerBound = this->_sensorSmallIdMap[sensorSmallId].traits["lowerBound"];
-						double upperBound = this->_sensorSmallIdMap[sensorSmallId].traits["upperBound"];
-						double range = abs(upperBound - lowerBound);
+						// double lowerBound = this->_sensorSmallIdMap[sensorSmallId].traits["lowerBound"];
+						// double upperBound = this->_sensorSmallIdMap[sensorSmallId].traits["upperBound"];
+						// double range = abs(upperBound - lowerBound);
 						std::visit(
 							[&](auto previousValue) {
 								std::visit(
 									[&](auto currentValue) {
-										double difference = double(abs((double)(currentValue - previousValue)));
-										double delta = difference / range;
-										if (delta >= SIGNIFICANCE_THRESHOLD) {
+										//double difference = double(abs((double)(currentValue - previousValue)));
+										//double delta = difference / range;
+										//if (delta >= SIGNIFICANCE_THRESHOLD) {
 											data.push_back({sensorSmallId, currentValue});
-										}
+										//}
 									},
 									_readBuffer[sensorSmallId]
 								);
@@ -142,7 +158,7 @@ void CanBus::readCanBus() {
 				// Execute the callback if there is new data
 				if (data.size() != 0) {
 					std::future<void> f = std::async(std::launch::async, [=]() {
-						this->_callback(timestamp, data);
+						callback(timestamp, data);
 					});
 					changeSet.clear();
 				}
@@ -155,7 +171,7 @@ void CanBus::readCanBus() {
 	}
 }
 
-void CanBus::closeCanBus() {
+void CanBus::close() {
 	if (!_closed) {
     {
       std::lock_guard<std::mutex> safe_lock(_lock);

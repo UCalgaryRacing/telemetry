@@ -14,7 +14,7 @@ Sensor::Sensor(std::vector<std::string> keys, std::vector<std::string> values) {
     else if (key == "type") data[key] = values[i];
     else if (key == "lastUpdate") data[key] = std::stoul(values[i]);
     else if (key == "frequency") data[key] = (unsigned char)std::stoul(values[i]);
-    else if (key == "canId") data[key] = (unsigned int)std::stoul(values[i]);
+    else if (key == "canId" || key == "canOffset") data[key] = (unsigned int)std::stoul(values[i]);
     else if (key == "upperCalibration") data[key] = std::stod(values[i]);
     else if (key == "lowerCalibration") data[key] = std::stod(values[i]);
     else if (key == "upperBound") data[key] = std::stod(values[i]);
