@@ -83,6 +83,21 @@
     "algorithm": "cpp",
     "functional": "cpp",
     "iterator": "cpp",
-    "utility": "cpp"
+    "utility": "cpp",
+    "*.tcc": "cpp",
+    "cfenv": "cpp",
+    "cinttypes": "cpp",
+    "codecvt": "cpp",
+    "csetjmp": "cpp",
+    "cuchar": "cpp",
+    "unordered_set": "cpp",
+    "filesystem": "cpp",
+    "memory_resource": "cpp",
+    "rope": "cpp",
+    "slist": "cpp",
+    "future": "cpp",
+    "scoped_allocator": "cpp",
+    "shared_mutex": "cpp",
+    "typeindex": "cpp"
   }
 }

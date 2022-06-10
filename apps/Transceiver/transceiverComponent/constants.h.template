@@ -4,10 +4,13 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
+#define DEBUG false
+
 #define WEB_SERVER_ENDPOINT XXX
 #define SERIAL_NUMBER XXX
 #define API_KEY XXX
 
 #define SIGNIFICANCE_THRESHOLD XXX // 0-1
+#define START_WITH_ENGINE false
 
 #endif

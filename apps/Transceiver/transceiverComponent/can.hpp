@@ -38,7 +38,7 @@ class CanBus {
     /**
      * @brief
      */
-    void translate(auto& data);
+    void translate(auto& data, bool signedValue);
 
   public:
     CanBus() = delete;

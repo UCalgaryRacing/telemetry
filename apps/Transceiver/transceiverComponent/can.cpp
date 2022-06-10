@@ -4,7 +4,6 @@
 #include "can.hpp"
 #include <iostream>
 #include <iomanip>
-#define DEBUG = 1
 
 CanBus::CanBus(std::vector<Sensor> sensors) {
 	// Get the callback frequency, create the sensor map, and initialize the buffer
@@ -60,12 +59,16 @@ void CanBus::open() {
   if (_closed) _closed = false;
 }
 
-void CanBus::translate(auto& datum) {
+void CanBus::translate(auto& datum, bool signedValue) {
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(&datum);
 	unsigned char low = bytes[0];
 	unsigned char high = bytes[1];
 	int num = high * 256 + low;
-	if (num > 32767) num -= 65536;
+  if (signedValue) {
+	  if (num > 32767) {
+      num -= 65536;
+    }
+  }
 	datum = (decltype(datum))num;
 }
 
@@ -85,10 +88,10 @@ void CanBus::poll() {
 			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
 			unsigned char *bytes = canFrame.data;
 			unsigned int canId = canFrame.can_id;
-			#if DEBUG = 1
+			#if DEBUG
 			std::stringstream stream;
 			stream << std::hex << canId;
-			std::cout << result(stream.str()) << std::endl;
+			std::cout << stream.str() << std::endl;
 			#endif
 			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
 				for (const Sensor& sensor: this->_sensorCanIdMap[canId]) {
@@ -97,7 +100,7 @@ void CanBus::poll() {
 						[&](auto v) {
 							decltype(v) datum = *(reinterpret_cast<decltype(v)*>(bytes + offset));
 							if (this->_translationIds.find(sensor.traits["smallId"]) != this->_translationIds.end()) {
-								this->translate(datum);
+								this->translate(datum, sensor.traits["type"] == 'h');
 							}
 							this->_canBuffer[sensor.traits["smallId"]] = datum;
 						},
