@@ -64,11 +64,11 @@ void CanBus::translate(auto& datum, bool signedValue) {
 	unsigned char low = bytes[0];
 	unsigned char high = bytes[1];
 	int num = high * 256 + low;
-  if (signedValue) {
-	  if (num > 32767) {
-      num -= 65536;
-    }
-  }
+	if (signedValue) {
+		if (num > 32767) {
+			num -= 65536;
+		}
+	}
 	datum = (decltype(datum))num;
 }
 
@@ -88,11 +88,7 @@ void CanBus::poll() {
 			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
 			unsigned char *bytes = canFrame.data;
 			unsigned int canId = canFrame.can_id;
-			#if DEBUG
-			std::stringstream stream;
-			stream << std::hex << canId;
-			std::cout << stream.str() << std::endl;
-			#endif
+			std::cout << "Can ID: " << canId << std::endl;
 			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
 				for (const Sensor& sensor: this->_sensorCanIdMap[canId]) {
 					unsigned int offset = sensor.traits["canOffset"];
@@ -102,6 +98,7 @@ void CanBus::poll() {
 							if (this->_translationIds.find(sensor.traits["smallId"]) != this->_translationIds.end()) {
 								this->translate(datum, sensor.traits["type"] == 'h');
 							}
+							std::cout << datum << std::endl;
 							this->_canBuffer[sensor.traits["smallId"]] = datum;
 						},
 						sensor.getVariant()

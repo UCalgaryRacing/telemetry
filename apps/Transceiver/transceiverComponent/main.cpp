@@ -43,19 +43,14 @@ COMPONENT_INIT {
 	canBus.open();
 	std::thread pollingThread([&]{ canBus.poll(); });
 
-	// Wait for the engine to start before starting telemetry
-	#if START_WITH_ENGINE
-	while (!canBus.engineStarted()) std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	#endif
-
 	// Attempt to start a session with the server
 	while (!transceiver.requestSession()) std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	transceiver.initializeUdp();
 
 	// Start the CAN reading thread
 	auto callback = [&](unsigned int timestamp, std::vector<SensorVariantPair> data) {
-			std::vector<unsigned char> bytes = encode_data(timestamp, data);
-			transceiver.sendVfdcpData(bytes);
+		std::vector<unsigned char> bytes = encode_data(timestamp, data);
+		transceiver.sendVfdcpData(bytes);
 	};
 	canBus.decimateFrequency(callback);
 	pollingThread.join();
