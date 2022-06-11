@@ -98,7 +98,7 @@ void CanBus::poll() {
 							if (this->_translationIds.find(sensor.traits["smallId"]) != this->_translationIds.end()) {
 								this->translate(datum, sensor.traits["type"] == 'h');
 							}
-							std::cout << datum << std::endl;
+							std::cout << sensor.traits["name"] << ": " << datum << std::endl;
 							this->_canBuffer[sensor.traits["smallId"]] = datum;
 						},
 						sensor.getVariant()

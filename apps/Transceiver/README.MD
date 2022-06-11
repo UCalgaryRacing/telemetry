@@ -41,3 +41,5 @@ cm data connect
 
 To change the apn to that of your carrier:
 cm data apn <apn_value>
+
+logread -f | grep "transceiver"
