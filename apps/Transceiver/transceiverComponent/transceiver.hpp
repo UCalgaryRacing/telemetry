@@ -13,6 +13,8 @@
 #include "../inc/json.hpp"
 #include "sensor.hpp"
 
+using SensorDiff = std::optional<std::pair<std::unordered_map<unsigned char, Sensor>, std::vector<std::string>>>;
+
 class Transceiver {
   private:
     // REST request fields
@@ -26,6 +28,8 @@ class Transceiver {
     std::string _remoteUdpAddress;
     struct sockaddr_in _serverAddress;
 
+    std::string _sensorDataFile = "~/sensor_data";
+
   public:
     Transceiver() = delete;
     Transceiver(std::string sn, std::string key, std::string address) : _serialNumber(sn), _apiKey(key), _webAddress(address) {}
@@ -35,6 +39,21 @@ class Transceiver {
      * @brief Fetch the entire list of sensors for the particular serial number of a "thing."
      */
     std::optional<std::vector<Sensor>> fetchSensors();
+
+    /**
+     * @brief Fetch the sensors that have changed since the last update 
+     */
+    SensorDiff fetch_sensor_diff(unsigned long long last_update);
+
+    /**
+     * @brief
+     */
+    std::unordered_map<int, json> populateSensors();
+
+    /**
+     * @brief
+     */
+    void cacheSensors(std::vector<Sensor> sensors);
 
      /**
      * @brief Requests the server to start a session, gets a UDP port to send to if successful. 
