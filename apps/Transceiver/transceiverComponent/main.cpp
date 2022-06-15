@@ -15,16 +15,23 @@
 COMPONENT_INIT {
 	// Connect to LTE and start the CAN driver
 	system("sh /home/root/start_connect.sh &");
-	while (1) {
-		char line[256];
-		FILE* fp = popen("/home/root/start_can.sh red 2>&1", "r");
-		LE_ASSERT(fp != NULL);
-		if (fp == NULL) continue;
-		while (fgets(line, sizeof(line), fp) != NULL);
-		int result = pclose(fp);
-		if (!WIFEXITED(result)) continue;
-		if (WEXITSTATUS(result) != 0) continue;
-		break;
+
+	// Attempt to open the can port a bunch and hope for the best
+	int i = 0;
+	while (i < 10) {
+		system("sh /home/root/start_can.sh red &");
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		i++;
+		// CHECK FOR ERROR IN OPENING
+		// char line[256];
+		// FILE* fp = popen("sh /home/root/start_can.sh red 2>&1", "r");
+		// LE_ASSERT(fp != NULL);
+		// if (fp == NULL) continue;
+		// while (fgets(line, sizeof(line), fp) != NULL);
+		// int result = pclose(fp);
+		// if (!WIFEXITED(result)) continue;
+		// if (WEXITSTATUS(result) != 0) continue;
+		// break;
 	}
 
 	// Attempt to fetch the sensors from the server
@@ -56,17 +63,17 @@ COMPONENT_INIT {
 	pollingThread.join();
 }
 
-	// TESTING
-	// std::vector<SensorVariantPair> data{};
-	// for (auto sensor: sensors.value()) {
-	// 		SensorVariantPair datum = std::make_pair(sensor.traits["smallId"], sensor.getVariant());
-	// 		data.push_back(datum);
-	// }
-	// transceiver.initializeUdp();
-	// for (unsigned int i = 0; i < 1000; i++) {
-	// 		std::vector<unsigned char> bytes = encode_data(i, data);
-	// 		transceiver.sendVfdcpData(bytes);
-	// 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	// }
+// TESTING
+// std::vector<SensorVariantPair> data{};
+// for (auto sensor: sensors.value()) {
+// 		SensorVariantPair datum = std::make_pair(sensor.traits["smallId"], sensor.getVariant());
+// 		data.push_back(datum);
+// }
+// transceiver.initializeUdp();
+// for (unsigned int i = 0; i < 1000; i++) {
+// 		std::vector<unsigned char> bytes = encode_data(i, data);
+// 		transceiver.sendVfdcpData(bytes);
+// 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+// }
 
-	// return;
+// return;
