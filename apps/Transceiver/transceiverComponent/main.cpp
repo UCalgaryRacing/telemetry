@@ -2,6 +2,8 @@
 // Written by Jon Mulyk and Justin Tijunelis
 
 #include "legato.h"
+#include "interfaces.h"
+// #include "interfaces/positioning/le_gnss.h"
 #include <thread>
 #include <iostream>
 #include <optional>
@@ -11,15 +13,21 @@
 #include "constants.h"
 #include "transceiver.hpp"
 #include "vfdcp_encoder.hpp"
+#include "gnss.hpp"
 
 COMPONENT_INIT {
+	// GNSS gnss;
+	// gnssObj.location();
+	// gnss.positionHanlder();
+
 	// Connect to LTE and start the CAN driver
 	system("sh /home/root/start_connect.sh &");
+	// system("sh /home/root/start_gnss.sh &");
 
 	// Attempt to open the can port a bunch and hope for the best
 	int i = 0;
 	while (i < 10) {
-		system("sh /home/root/start_can.sh red &");
+		system("sh /home/root/start_can.sh yellow &");
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		i++;
 		// CHECK FOR ERROR IN OPENING
@@ -59,6 +67,11 @@ COMPONENT_INIT {
 		std::vector<unsigned char> bytes = encode_data(timestamp, data);
 		transceiver.sendVfdcpData(bytes);
 	};
+
+	// std::thread GNSSThread([&]{ gnss.positionHanlder(); });
+	// // std::thread GNSSThread (&GNSS::positionHanlder);
+	// GNSSThread.join();
+
 	canBus.decimateFrequency(callback);
 	pollingThread.join();
 }
@@ -77,3 +90,6 @@ COMPONENT_INIT {
 // }
 
 // return;
+
+// CANID not being used
+// LAT LONG, ALT

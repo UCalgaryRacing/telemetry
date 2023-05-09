@@ -28,8 +28,11 @@ bool CanBus::initialize() {
 	struct ifreq ifr;
 	struct sockaddr_can addr;
 	int sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	if (sock < 0) return false;
-	addr.can_family = AF_CAN;
+	if (sock < 0) 
+	{
+		return false; 
+	}
+	addr.can_family = AF_CAN; 
 	strcpy(ifr.ifr_name, "can0");
 	if (ioctl(sock, SIOCGIFINDEX, &ifr) < 0) {
 		return false;
