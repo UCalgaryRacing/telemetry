@@ -24,3 +24,8 @@ requires: {
 	}
 }
 
+
+bindings:
+{
+	transceiver.transceiverComponent.le_gnss -> positioningService.le_gnss
+}

@@ -5,9 +5,19 @@ sources:
     transceiver.cpp
     vfdcp_encoder.cpp
     sensor.cpp
+    gnss.cpp
 }
 
 cxxflags:
 {
     -std=c++17
+}
+
+
+requires:
+{
+    api:
+    {
+        positioning/le_gnss.api
+    }
 }
