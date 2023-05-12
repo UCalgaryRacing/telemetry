@@ -47,11 +47,12 @@ bool CanBus::initialize() {
 
 bool CanBus::engineStarted() {
 	// If the RPM goes over 1000, the engine is surely on...
-	if (this->_canBuffer.find(7) != this->_canBuffer.end()) {
-		return std::get<unsigned short>(this->_canBuffer[7]) > 1000.0f;
-	} else {
-		return false;
-	}
+	// if (this->_canBuffer.find(25) != this->_canBuffer.end()) {
+	// 	return std::get<unsigned short>(this->_canBuffer[25]) > 1000.0f;
+	// } else {
+	// 	return false;
+	// }
+	return true;
 }
 
 void CanBus::open() {
@@ -88,7 +89,6 @@ void CanBus::poll() {
 			if (!read(this->_canSocket, &canFrame, sizeof(struct can_frame))) continue;
 			unsigned char *bytes = canFrame.data;
 			unsigned int canId = canFrame.can_id;
-			std::cout << "Can ID: " << canId << std::endl;
 			if (this->_sensorCanIdMap.find(canId) != this->_sensorCanIdMap.end()) {
 				for (const Sensor& sensor: this->_sensorCanIdMap[canId]) {
 					unsigned int offset = sensor.traits["canOffset"];
@@ -145,6 +145,9 @@ void CanBus::decimateFrequency(ReadCallback callback) {
 								std::visit(
 									[&](auto currentValue) {
 										double difference = double(abs((double)(currentValue - previousValue)));
+										if(range == 0.0) {
+											range = 0.1;
+										}
 										double delta = difference / range;
 										if (delta >= SIGNIFICANCE_THRESHOLD) {
 											data.push_back({sensorSmallId, currentValue});
@@ -160,7 +163,7 @@ void CanBus::decimateFrequency(ReadCallback callback) {
 					}
 					this->_readBuffer[sensorSmallId] = _canBuffer[sensorSmallId];
 				}
-
+	
 				// Execute the callback if there is new data
 				if (data.size() != 0) {
 					std::future<void> f = std::async(std::launch::async, [=]() {

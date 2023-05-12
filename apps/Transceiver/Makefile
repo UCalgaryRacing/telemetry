@@ -35,6 +35,12 @@ verify:
 	@echo $(OBJS)
 	@echo $(NRT)
 
+telem:
+	mkapp -t wp76xx transceiver.adef
+
+updateTelem:
+	update transceiver.wp76xx.update 192.168.2.2
+
 clean:
 	-@$(RM) $(OBJS) $(NRT)
 

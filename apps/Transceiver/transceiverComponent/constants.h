@@ -10,7 +10,7 @@
 #define SERIAL_NUMBER "3196dbf6-96a2-473d-8316-bfa890f47340"
 #define API_KEY "b98e1ca5-d6ee-45be-9dc1-551797a6839f"
 
-#define SIGNIFICANCE_THRESHOLD 0 // 0-1
+#define SIGNIFICANCE_THRESHOLD 0.0 // 0-1
 #define START_WITH_ENGINE false
 
 #endif
